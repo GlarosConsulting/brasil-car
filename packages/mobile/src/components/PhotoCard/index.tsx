@@ -9,12 +9,14 @@ interface IPhotoCardProps extends ViewProps {
   title: string;
   width: string | number;
   height: string | number;
+  onPhotoUriChange?(uri?: string): void;
 }
 
 const PhotoCard: React.FC<IPhotoCardProps> = ({
   title,
   width,
   height,
+  onPhotoUriChange,
   ...rest
 }) => {
   const [photoUri, setPhotoUri] = useState<string>();
@@ -22,8 +24,12 @@ const PhotoCard: React.FC<IPhotoCardProps> = ({
   const handleLaunchCamera = useCallback(() => {
     launchCamera({ mediaType: 'photo' }, ({ uri }) => {
       setPhotoUri(uri);
+
+      if (onPhotoUriChange) {
+        onPhotoUriChange(uri);
+      }
     });
-  }, []);
+  }, [onPhotoUriChange]);
 
   const handleLaunchLibrary = useCallback(() => {
     launchImageLibrary(
@@ -32,9 +38,13 @@ const PhotoCard: React.FC<IPhotoCardProps> = ({
       },
       ({ uri }) => {
         setPhotoUri(uri);
+
+        if (onPhotoUriChange) {
+          onPhotoUriChange(uri);
+        }
       },
     );
-  }, []);
+  }, [onPhotoUriChange]);
 
   return (
     <OptionsMenu
