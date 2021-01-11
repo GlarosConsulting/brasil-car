@@ -16,7 +16,7 @@ export const Row = styled(GridRow)`
   justify-content: space-between;
 `;
 
-export const SendButtonContainer = styled.View`
+export const SendButtonContainer = styled.TouchableOpacity`
   background: #7b84db;
   width: 100%;
   height: 56px;
