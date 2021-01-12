@@ -2,7 +2,14 @@ import { useRouter } from 'next/router';
 import React, { useCallback, useRef } from 'react';
 import { FiLock, FiUser } from 'react-icons/fi';
 
-import { Button, Flex, Heading, Link, useDisclosure } from '@chakra-ui/core';
+import {
+  Button,
+  Flex,
+  Heading,
+  Link,
+  useDisclosure,
+  useToast,
+} from '@chakra-ui/core';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
@@ -24,6 +31,8 @@ interface IUserCredentialsFormData {
 
 const Login: React.FC = () => {
   const { signIn } = useAuthentication();
+
+  const toast = useToast();
   const formRef = useRef<FormHandles>(null);
   const router = useRouter();
 
@@ -63,6 +72,16 @@ const Login: React.FC = () => {
 
         formRef.current?.setErrors(errors);
       }
+      if (err.code === 'auth/wrong-password') {
+        toast({
+          position: 'top',
+          status: 'error',
+          title: 'E-mail ou senha inválidos.',
+          isClosable: true,
+          description:
+            'Por favor verifique seu e-mail e senha e tente novamente.',
+        });
+      }
     }
   }, []);
 
@@ -84,7 +103,9 @@ const Login: React.FC = () => {
           borderRadius="md"
           flexDirection="column"
           alignItems="stretch"
-          padding={16}
+          padding={6}
+          paddingTop={0}
+          paddingBottom={0}
           width="100%"
           maxWidth="500px"
         >
@@ -154,9 +175,16 @@ const Login: React.FC = () => {
             console.log('mensagem enviada');
           }}
         />
-
-        <Footer />
       </Flex>
+      <Footer
+        height={{
+          xs: '0px',
+          sm: '0px',
+          md: '10px',
+          lg: '40px',
+          xl: '60px',
+        }}
+      />
     </>
   );
 };
