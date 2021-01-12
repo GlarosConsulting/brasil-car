@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 import { FiPower } from 'react-icons/fi';
 import {
@@ -27,7 +28,9 @@ const Sidebar: React.FC<ISidebarProps> = () => {
       <ProSidebar>
         <SidebarContent>
           <Menu iconShape="circle">
-            <MenuItem>Movimentação Caixa</MenuItem>
+            <Link href="/cash-handling">
+              <MenuItem>Movimentação Caixa</MenuItem>
+            </Link>
             <MenuItem>Mensalidades</MenuItem>
             <MenuItem>Pendências</MenuItem>
           </Menu>

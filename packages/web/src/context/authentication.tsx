@@ -10,6 +10,7 @@ import React, {
 import firebase from 'firebase/app';
 
 import firebaseApp from '@/lib/firebase';
+import usePersistedState from '@/utils/hooks/usePersistedState';
 
 interface IUserCredentials {
   email: string;
@@ -45,12 +46,55 @@ const AuthenticationContext = createContext<IAuthenticationContext | null>(
 
 const AuthenticationProvider: React.FC = ({ children }) => {
   const [user, setUser] = useState<IUser>(null);
+  const [isLoggedIn, setIsLoggedIn] = usePersistedState<string | null>(
+    'session',
+    null,
+  );
   const router = useRouter();
+
+  useEffect(
+    () =>
+      firebase.auth().onIdTokenChanged(async updatedUser => {
+        if (!updatedUser) {
+          setUser(null);
+          setIsLoggedIn(null);
+        } else {
+          const token = await updatedUser.getIdToken();
+
+          const reference = await firebaseApp
+            .database()
+            .ref(`users/${updatedUser.uid}`)
+            .get();
+
+          const data = reference.val();
+
+          setUser({
+            data: updatedUser,
+            additional: data,
+          });
+
+          setIsLoggedIn(token);
+        }
+      }),
+    [],
+  );
+
+  useEffect(() => {
+    const handle = setInterval(async () => {
+      const { currentUser } = firebaseApp.auth();
+
+      if (currentUser) await currentUser.getIdToken(true);
+    }, 10 * 60 * 1000);
+
+    // clean up setInterval
+    return () => clearInterval(handle);
+  }, []);
 
   useEffect(() => {
     firebaseApp.auth().onAuthStateChanged(async newUser => {
       if (!newUser) {
         setUser(null);
+        setIsLoggedIn(null);
 
         return;
       }
@@ -60,6 +104,10 @@ const AuthenticationProvider: React.FC = ({ children }) => {
         .ref(`users/${newUser.uid}`)
         .get();
       const data = reference.val();
+
+      const token = await newUser.getIdToken();
+
+      setIsLoggedIn(token);
 
       setUser({
         data: newUser,
@@ -75,24 +123,27 @@ const AuthenticationProvider: React.FC = ({ children }) => {
     );
   }, []);
 
-  // useEffect(() => {
-  //   const route = router.asPath;
+  useEffect(() => {
+    if (isLoggedIn === undefined) {
+      router.replace('/login');
 
-  //   const isRoute = (name: string) => route.split('?')[0] === name;
+      return;
+    }
 
-  //   console.log(user);
-  //   if (user && isRoute('/login')) {
-  //     router.replace('/home');
-  //     return;
-  //   }
+    const route = router.asPath;
 
-  //   if (!user && !isRoute('/login')) {
-  //     router.replace('/login');
-  //     console.log('1');
+    const isRoute = (name: string) => route.split('?')[0] === name;
 
-  //     console.log(user);
-  //   }
-  // }, [user]);
+    if (isLoggedIn && isRoute('/login')) {
+      router.replace('/home');
+
+      return;
+    }
+
+    if (!isLoggedIn && !isRoute('/login')) {
+      router.replace('/login');
+    }
+  }, [user, router]);
 
   const createUser = useCallback(
     async ({ email, password }: IUserCredentials): Promise<firebase.User> => {
@@ -158,7 +209,11 @@ const AuthenticationProvider: React.FC = ({ children }) => {
     [],
   );
 
-  const signOut = useCallback(async () => firebaseApp.auth().signOut(), []);
+  const signOut = useCallback(async () => {
+    setIsLoggedIn(null);
+
+    firebaseApp.auth().signOut();
+  }, []);
 
   const sendForgotPasswordEmail = useCallback(
     async (email: string) => firebaseApp.auth().sendPasswordResetEmail(email),
