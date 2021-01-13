@@ -140,6 +140,10 @@ const AuthenticationProvider: React.FC = ({ children }) => {
       return;
     }
 
+    if (isRoute('/')) {
+      router.replace('/login');
+    }
+
     if (!isLoggedIn && !isRoute('/login')) {
       router.replace('/login');
     }

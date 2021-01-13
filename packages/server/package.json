@@ -4,7 +4,7 @@
   "author": "André 'Dezzy' <@andredezzy>",
   "private": true,
   "scripts": {
-    "build": "babel src --extensions \".ts,.js\" --out-dir dist --copy-files",
+    "build": "rimraf dist && babel src --extensions \".ts,.js\" --out-dir dist --copy-files",
     "dev": "ts-node-dev -r tsconfig-paths/register --inspect --transpile-only --ignore-watch node_modules src/shared/infra/http/server.ts",
     "start": "node dist/shared/infra/http/server.js",
     "typeorm": "ts-node-dev -r tsconfig-paths/register node_modules/typeorm/cli.js",

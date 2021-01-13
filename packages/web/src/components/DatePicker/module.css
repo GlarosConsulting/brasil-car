@@ -32,7 +32,7 @@
   height: 100%;
   outline: 0;
   background: #CBD5E0;
-  color: #f3f;
+  color: #000;
 }
 
 .react-datepicker__navigation--next--with-time:not(.react-datepicker__navigation--next--with-today-button) {
