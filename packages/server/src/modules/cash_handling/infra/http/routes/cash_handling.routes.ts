@@ -14,6 +14,7 @@ cashHandlingRouter.post(
       bank_value: Joi.number().required(),
       return_value: Joi.number().required(),
       bank_tariff_value: Joi.number().required(),
+      is_previous_balance: Joi.boolean(),
     },
   }),
   cashHandlingController.create,

@@ -8,16 +8,36 @@ import ListCashHandlingService from '@modules/cash_handling/services/ListCashHan
 
 export default class CashHandling {
   public async create(request: Request, response: Response): Promise<Response> {
-    const { date, bank_value, return_value, bank_tariff_value } = request.body;
-
-    const createCashHandling = container.resolve(CreateCashHandlingService);
-
-    const cashHandling = await createCashHandling.execute({
+    const {
       date,
       bank_value,
       return_value,
       bank_tariff_value,
-    });
+      is_previous_balance,
+    } = request.body;
+
+    const createCashHandling = container.resolve(CreateCashHandlingService);
+
+    let formData;
+
+    if (is_previous_balance) {
+      formData = {
+        date,
+        bank_value,
+        return_value,
+        bank_tariff_value,
+        is_previous_balance,
+      };
+    } else {
+      formData = {
+        date,
+        bank_value,
+        return_value,
+        bank_tariff_value,
+      };
+    }
+
+    const cashHandling = await createCashHandling.execute(formData);
 
     return response.json(classToClass(cashHandling));
   }

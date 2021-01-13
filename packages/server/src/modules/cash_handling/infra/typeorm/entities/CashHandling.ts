@@ -23,6 +23,9 @@ export default class User {
   @Column()
   bank_tariff_value: number;
 
+  @Column()
+  is_previous_balance: boolean;
+
   @CreateDateColumn()
   created_at: Date;
 

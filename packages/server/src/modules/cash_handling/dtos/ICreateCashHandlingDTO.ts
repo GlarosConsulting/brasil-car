@@ -3,4 +3,5 @@ export default interface ICreateUserDTO {
   bank_value: number;
   return_value: number;
   bank_tariff_value: number;
+  is_previous_balance?: boolean;
 }

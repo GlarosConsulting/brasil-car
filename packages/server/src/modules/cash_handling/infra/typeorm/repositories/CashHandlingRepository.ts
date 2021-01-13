@@ -23,7 +23,10 @@ class CashHandlingRepository implements ICashHandlingRepository {
     finalDate: Date,
   ): Promise<CashHandling[] | undefined> {
     const cashHandling = await this.ormRepository.find({
-      where: { date: Between(initialDate, finalDate) },
+      where: [
+        { date: Between(initialDate, finalDate) },
+        { is_previous_balance: true },
+      ],
     });
 
     return cashHandling;
