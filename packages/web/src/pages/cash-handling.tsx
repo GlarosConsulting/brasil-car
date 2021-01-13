@@ -29,6 +29,7 @@ interface ICashHandling {
   bank_value: number;
   return_value: number;
   bank_tariff_value: number;
+  is_previous_balance: boolean;
 }
 
 const CASH_HANDLING_TABLE_COLUMNS = [
@@ -61,20 +62,36 @@ const CashHandling: React.FC = () => {
 
       console.log(cashHandling);
 
-      const dataTable = cashHandling.map(
-        row =>
-          row !== undefined && {
-            date: format(new Date(row.date), 'dd/MM/yyyy'),
-            bank: formatRealValue(row.bank_value),
-            return: (
-              <Text color="blue.400">{formatRealValue(row.return_value)}</Text>
-            ),
-            bank_tariff: (
-              <Text color="red.600">
-                {formatRealValue(row.bank_tariff_value)}
-              </Text>
-            ),
-          },
+      const dataTable = cashHandling.map(row =>
+        row.is_previous_balance === true
+          ? {
+              date: 'SALDO ANTERIOR',
+              bank: formatRealValue(row.bank_value),
+              return: (
+                <Text color="blue.400">
+                  {formatRealValue(row.return_value)}
+                </Text>
+              ),
+              bank_tariff: (
+                <Text color="red.600">
+                  {formatRealValue(row.bank_tariff_value)}
+                </Text>
+              ),
+            }
+          : {
+              date: format(new Date(row.date), 'dd/MM/yyyy'),
+              bank: formatRealValue(row.bank_value),
+              return: (
+                <Text color="blue.400">
+                  {formatRealValue(row.return_value)}
+                </Text>
+              ),
+              bank_tariff: (
+                <Text color="red.600">
+                  {formatRealValue(row.bank_tariff_value)}
+                </Text>
+              ),
+            },
       );
 
       setDataTable(dataTable);
@@ -88,22 +105,36 @@ const CashHandling: React.FC = () => {
         const cashHandling = response.data;
 
         setDataTable(
-          cashHandling.map(
-            row =>
-              row !== undefined && {
-                date: format(new Date(row.date), 'dd/MM/yyyy'),
-                bank: formatRealValue(row.bank_value),
-                return: (
-                  <Text color="blue.400">
-                    {formatRealValue(row.return_value)}
-                  </Text>
-                ),
-                bank_tariff: (
-                  <Text color="red.600">
-                    {formatRealValue(row.bank_tariff_value)}
-                  </Text>
-                ),
-              },
+          cashHandling.map(row =>
+            row.is_previous_balance === true
+              ? {
+                  date: 'SALDO ANTERIOR',
+                  bank: formatRealValue(row.bank_value),
+                  return: (
+                    <Text color="blue.400">
+                      {formatRealValue(row.return_value)}
+                    </Text>
+                  ),
+                  bank_tariff: (
+                    <Text color="red.600">
+                      {formatRealValue(row.bank_tariff_value)}
+                    </Text>
+                  ),
+                }
+              : {
+                  date: format(new Date(row.date), 'dd/MM/yyyy'),
+                  bank: formatRealValue(row.bank_value),
+                  return: (
+                    <Text color="blue.400">
+                      {formatRealValue(row.return_value)}
+                    </Text>
+                  ),
+                  bank_tariff: (
+                    <Text color="red.600">
+                      {formatRealValue(row.bank_tariff_value)}
+                    </Text>
+                  ),
+                },
           ),
         );
       });
