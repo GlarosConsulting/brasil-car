@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useState } from 'react';
 import { useCallback } from 'react';
 import { FiSearch } from 'react-icons/fi';
@@ -7,15 +7,29 @@ import { Column } from 'react-table';
 import { Box, Flex, Text, Button, Tooltip } from '@chakra-ui/core';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
-import { format, isWithinInterval } from 'date-fns';
+import { format } from 'date-fns';
 
 import DatePicker from '@/components/DatePicker';
 import Header from '@/components/Header';
 import SEO from '@/components/SEO';
 import Sidebar from '@/components/Sidebar';
 import Table from '@/components/Table';
-import cashHandlingData from '@/mocks/CashHandling';
+import api from '@/services/api';
 import formatRealValue from '@/utils/formatRealValue';
+
+interface IDataTable {
+  date: string;
+  bank: string;
+  return: JSX.Element;
+  bank_tariff: JSX.Element;
+}
+
+interface ICashHandling {
+  date: Date;
+  bank_value: number;
+  return_value: number;
+  bank_tariff_value: number;
+}
 
 const CASH_HANDLING_TABLE_COLUMNS = [
   {
@@ -39,46 +53,60 @@ const CASH_HANDLING_TABLE_COLUMNS = [
 const CashHandling: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
-  const [tableData, setDataTable] = useState(cashHandlingData);
+  const [tableData, setDataTable] = useState<IDataTable[]>([] as IDataTable[]);
 
-  const formattedTableData = useMemo(
-    () =>
-      tableData.map(
+  useEffect(() => {
+    api.get('/cash-handling').then(response => {
+      const cashHandling: Array<ICashHandling> = response.data;
+
+      console.log(cashHandling);
+
+      const dataTable = cashHandling.map(
         row =>
           row !== undefined && {
-            date:
-              row.date !== 'SALDO ANTERIOR'
-                ? format(new Date(row.date), 'dd/MM/yyyy')
-                : row.date,
-            bank: formatRealValue(row.bank),
-            return: <Text color="blue.400">{formatRealValue(row.return)}</Text>,
+            date: format(new Date(row.date), 'dd/MM/yyyy'),
+            bank: formatRealValue(row.bank_value),
+            return: (
+              <Text color="blue.400">{formatRealValue(row.return_value)}</Text>
+            ),
             bank_tariff: (
-              <Text color="red.600">{formatRealValue(row.bank_tariff)}</Text>
+              <Text color="red.600">
+                {formatRealValue(row.bank_tariff_value)}
+              </Text>
             ),
           },
-      ),
-    [tableData],
-  );
+      );
+
+      setDataTable(dataTable);
+    });
+  }, [setDataTable]);
 
   const handleSearchCashHandling = useCallback(({ initialDate, finalDate }) => {
-    const filtered = cashHandlingData.filter(row => {
-      if (row.date === 'SALDO ANTERIOR') {
-        return true;
-      }
+    api
+      .get('cash-handling', { params: { initialDate, finalDate } })
+      .then(response => {
+        const cashHandling = response.data;
 
-      if (
-        isWithinInterval(new Date(row.date), {
-          start: initialDate,
-          end: finalDate,
-        })
-      ) {
-        return true;
-      }
-
-      return false;
-    });
-
-    setDataTable(filtered);
+        setDataTable(
+          cashHandling.map(
+            row =>
+              row !== undefined && {
+                date: format(new Date(row.date), 'dd/MM/yyyy'),
+                bank: formatRealValue(row.bank_value),
+                return: (
+                  <Text color="blue.400">
+                    {formatRealValue(row.return_value)}
+                  </Text>
+                ),
+                bank_tariff: (
+                  <Text color="red.600">
+                    {formatRealValue(row.bank_tariff_value)}
+                  </Text>
+                ),
+              },
+          ),
+        );
+      });
   }, []);
 
   return (
@@ -132,7 +160,7 @@ const CashHandling: React.FC = () => {
             </Form>
 
             <Table
-              data={formattedTableData}
+              data={tableData}
               width="100%"
               height="100%"
               maxHeight={800}
