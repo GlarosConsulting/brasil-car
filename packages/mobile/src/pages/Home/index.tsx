@@ -35,6 +35,8 @@ const Home: React.FC = () => {
   }, []);
 
   const handleSend = useCallback(async () => {
+    Alert.alert(String(__DEV__));
+
     if (
       !forwardPhotoUri ||
       !croupPhotoUri ||
