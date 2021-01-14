@@ -35,7 +35,7 @@ const Table = <T extends object>({
   heading,
   columns,
   data,
-  pageSize: initialPageSize = 5,
+  pageSize: initialPageSize = 20,
   onRowClick,
   ...rest
 }: ITableProps<T>) => {
