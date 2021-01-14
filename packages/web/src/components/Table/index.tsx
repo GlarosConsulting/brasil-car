@@ -123,6 +123,7 @@ const Table = <T extends object>({
 
             return (
               <TableRow
+                fontSize="14px"
                 onClick={() => onRowClick && onRowClick(row)}
                   key={key} // eslint-disable-line
                 flexDirection="row"
