@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ViewProps } from 'react-native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import OptionsMenu from 'react-native-option-menu';
@@ -7,6 +7,7 @@ import { Container, Photo, TitleContainer, Title } from './styles';
 
 interface IPhotoCardProps extends ViewProps {
   title: string;
+  uri?: string | null;
   width: string | number;
   height: string | number;
   onPhotoUriChange?(uri?: string): void;
@@ -14,19 +15,24 @@ interface IPhotoCardProps extends ViewProps {
 
 const PhotoCard: React.FC<IPhotoCardProps> = ({
   title,
+  uri,
   width,
   height,
   onPhotoUriChange,
   ...rest
 }) => {
-  const [photoUri, setPhotoUri] = useState<string>();
+  const [photoUri, setPhotoUri] = useState<string | null>();
+
+  useEffect(() => {
+    setPhotoUri(uri);
+  }, [uri]);
 
   const handleLaunchCamera = useCallback(() => {
-    launchCamera({ mediaType: 'photo' }, ({ uri }) => {
+    launchCamera({ mediaType: 'photo' }, ({ uri: newUri }) => {
       setPhotoUri(uri);
 
       if (onPhotoUriChange) {
-        onPhotoUriChange(uri);
+        onPhotoUriChange(newUri);
       }
     });
   }, [onPhotoUriChange]);
@@ -36,11 +42,11 @@ const PhotoCard: React.FC<IPhotoCardProps> = ({
       {
         mediaType: 'photo',
       },
-      ({ uri }) => {
+      ({ uri: newUri }) => {
         setPhotoUri(uri);
 
         if (onPhotoUriChange) {
-          onPhotoUriChange(uri);
+          onPhotoUriChange(newUri);
         }
       },
     );
@@ -58,7 +64,7 @@ const PhotoCard: React.FC<IPhotoCardProps> = ({
         </Container>
       }
       destructiveIndex={1}
-      options={['Camera', 'Galeria', 'Cancel']}
+      options={['Camera', 'Galeria', 'Cancelar']}
       actions={[handleLaunchCamera, handleLaunchLibrary]}
     />
   );

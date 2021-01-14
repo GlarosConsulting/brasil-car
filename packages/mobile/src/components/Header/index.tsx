@@ -6,7 +6,7 @@ import { Container, UserLabel } from './styles';
 const Header: React.FC = () => (
   <Container>
     <View />
-    <UserLabel>Bem vindo, André Victor</UserLabel>
+    <UserLabel>Bem vindo, Fulano Ciclano</UserLabel>
   </Container>
 );
 
