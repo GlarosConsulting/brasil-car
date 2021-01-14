@@ -191,10 +191,16 @@ const CashHandling: React.FC = () => {
             </Form>
 
             <Table
+              flex={1}
               data={tableData}
               width="100%"
-              height="100%"
-              maxHeight={800}
+              maxHeight={{
+                xs: '20vh',
+                sm: '40vh',
+                md: '50vh',
+                lg: '55vh',
+                xl: '65vh',
+              }}
               columns={CASH_HANDLING_TABLE_COLUMNS}
             ></Table>
           </Flex>

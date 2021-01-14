@@ -102,7 +102,7 @@ const Login: React.FC = () => {
         <Flex
           borderRadius="md"
           flexDirection="column"
-          alignItems="stretch"
+          alignItems="center"
           padding={6}
           paddingTop={0}
           paddingBottom={0}
@@ -112,7 +112,7 @@ const Login: React.FC = () => {
           <Heading color="gray.800" marginBottom={6} marginTop={12}>
             Login
           </Heading>
-          <Form onSubmit={handleSignIn}>
+          <Form css={{ width: '100%' }} onSubmit={handleSignIn}>
             <Input name="email" icon={FiUser} placeholder="Usuário" />
 
             <Input
