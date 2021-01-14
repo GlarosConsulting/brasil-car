@@ -1,3 +1,4 @@
+import { endOfDay, startOfDay } from 'date-fns';
 import { injectable, inject } from 'tsyringe';
 
 import AppError from '@shared/errors/AppError';
@@ -22,8 +23,8 @@ class ListByDateIntervalService {
     finalDate,
   }: IRequest): Promise<CashHandling[]> {
     const cashHandling = await this.cashHandlingRepository.findByDateInterval(
-      initialDate,
-      finalDate,
+      startOfDay(initialDate),
+      endOfDay(finalDate),
     );
 
     if (!cashHandling) {
