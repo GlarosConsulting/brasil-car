@@ -25,13 +25,35 @@ export const DrawerHeaderTitle = styled.Text`
 export const DrawerHeaderVersion = styled.Text`
   font-size: 10px;
   color: #080e33;
-  margin-bottom: 2px;
+  margin-bottom: 2.5px;
+`;
+
+export const UserNameText = styled.Text`
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 24px;
 `;
 
 export const MenuContainer = styled.View`
-  margin-top: 8px;
+  margin-top: 10px;
 `;
 
-export const MenuItemContainer = styled.TouchableOpacity``;
+export const MenuItemContainer = styled.View`
+  border-top-width: 1px;
+  border-top-color: #12162b;
+`;
 
-export const MenuItemText = styled.Text``;
+export const MenuItemLabelContainer = styled.TouchableOpacity`
+  margin-left: 8px;
+  padding: 8px 0;
+
+  font-size: 17px;
+
+  flex-direction: row;
+  align-items: center;
+`;
+
+export const MenuItemText = styled.Text`
+  margin-left: 8px;
+  font-size: 17px;
+`;

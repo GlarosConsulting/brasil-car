@@ -3,6 +3,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -25,6 +26,7 @@ import {
 
 const Authentication: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
+
   const { signInWithGoogle } = useAuth();
 
   return (
@@ -41,6 +43,7 @@ const Authentication: React.FC = () => {
           <View>
             <Title>Faça seu logon</Title>
           </View>
+
           {/*
           <Form
             ref={formRef}
@@ -72,7 +75,7 @@ const Authentication: React.FC = () => {
               formRef.current?.submitForm();
             }}
           >
-            Entrar
+            <Text>Entrar</Text>
           </TouchableOpacity>
           {/* </Form> */}
 

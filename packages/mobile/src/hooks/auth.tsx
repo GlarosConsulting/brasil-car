@@ -12,6 +12,7 @@ import {
   statusCodes,
 } from '@react-native-community/google-signin';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import database from '@react-native-firebase/database';
 
 interface IAuthContextData {
   user: FirebaseAuthTypes.UserCredential;
@@ -38,7 +39,7 @@ export const AuthProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     async function loadStorageData(): Promise<void> {
-      const user = await AsyncStorage.getItem('@GlarosApp:user');
+      const user = await AsyncStorage.getItem('@BrasilCar:user');
 
       if (user) {
         setData({ user: JSON.parse(user) });
@@ -54,7 +55,7 @@ export const AuthProvider: React.FC = ({ children }) => {
 
       setData(user);
 
-      await AsyncStorage.setItem('@GlarosApp:user', JSON.stringify(user));
+      await AsyncStorage.setItem('@BrasilCar:user', JSON.stringify(user));
     } catch (error) {
       console.log(error);
       throw new Error('error.');
@@ -63,7 +64,14 @@ export const AuthProvider: React.FC = ({ children }) => {
 
   const signUp = useCallback(async (email, password): Promise<void> => {
     try {
-      await auth().createUserWithEmailAndPassword(email, password);
+      const response = await auth().createUserWithEmailAndPassword(
+        email,
+        password,
+      );
+
+      await database().ref(`users/${response.user.uid}`).set({
+        company: 'brasil-car',
+      });
     } catch (error) {
       throw new Error('error');
     }
@@ -77,7 +85,7 @@ export const AuthProvider: React.FC = ({ children }) => {
       } catch (err) {
         await auth().signOut();
       }
-      await AsyncStorage.removeItem('@GlarosApp:user');
+      await AsyncStorage.removeItem('@BrasilCar:user');
 
       setData({} as FirebaseAuthTypes.UserCredential);
     } catch (error) {
