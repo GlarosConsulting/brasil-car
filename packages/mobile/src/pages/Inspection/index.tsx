@@ -5,6 +5,7 @@ import { CircleSnail } from 'react-native-progress';
 import Header from '../../components/Header';
 import PhotoCard from '../../components/PhotoCard';
 import api from '../../services/api';
+
 import {
   Container,
   Cards,
