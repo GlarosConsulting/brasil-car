@@ -17,6 +17,7 @@ import uploadConfig from '@config/upload';
 import AppError from '@shared/errors/AppError';
 
 import WebSocket from '../websocket/server';
+
 // import rateLimiter from './middlewares/rateLimiter';
 import routes from './routes';
 

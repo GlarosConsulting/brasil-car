@@ -3,14 +3,10 @@ import 'react-native-gesture-handler';
 import React, { useEffect } from 'react';
 import { requestMultiple, PERMISSIONS } from 'react-native-permissions';
 
-import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 
-import Authentication from './pages/Authentication';
-import Home from './pages/Home';
-import Inspection from './pages/Inspection';
-
-const Drawer = createDrawerNavigator();
+import CustomDrawer from './components/CustomDrawer';
+import AppProvider from './hooks';
 
 const App = () => {
   useEffect(() => {
@@ -21,13 +17,11 @@ const App = () => {
   }, []);
 
   return (
-    <NavigationContainer>
-      <Drawer.Navigator initialRouteName="Authentication">
-        <Drawer.Screen name="Authentication" component={Authentication} />
-        <Drawer.Screen name="Home" component={Home} />
-        <Drawer.Screen name="Inspection" component={Inspection} />
-      </Drawer.Navigator>
-    </NavigationContainer>
+    <AppProvider>
+      <NavigationContainer>
+        <CustomDrawer />
+      </NavigationContainer>
+    </AppProvider>
   );
 };
 
