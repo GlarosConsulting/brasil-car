@@ -28,6 +28,7 @@ interface IUser {
 
 interface IAuthenticationContext {
   user: IUser | null;
+  isLoggedIn: string | null;
   createUser(credentials: IUserCredentials): Promise<firebase.User>;
   signIn(credentials: IUserCredentials): Promise<firebase.User>;
   signInWithPopup(provider: Provider): Promise<firebase.User>;
@@ -258,6 +259,7 @@ const AuthenticationProvider: React.FC = ({ children }) => {
     <AuthenticationContext.Provider
       value={{
         user,
+        isLoggedIn,
         createUser,
         signIn,
         signInWithPopup,
