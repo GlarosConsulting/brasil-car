@@ -156,7 +156,7 @@ const AuthenticationProvider: React.FC = ({ children }) => {
         .createUserWithEmailAndPassword(email, password);
 
       await firebaseApp.database().ref(`users/${response.user.uid}`).set({
-        company: 'test',
+        company: 'brasil-car',
       });
 
       return response.user;
