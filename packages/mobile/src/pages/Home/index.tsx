@@ -1,16 +1,17 @@
 import React from 'react';
-import { Text } from 'react-native';
 
 import Header from '../../components/Header';
 
-import { Container } from './styles';
+import { Container, ContactButtonContainer, ContactButtonText } from './styles';
 
 const Home: React.FC = () => (
   <>
     <Header />
 
     <Container>
-      <Text>Home</Text>
+      <ContactButtonContainer activeOpacity={0.6}>
+        <ContactButtonText>Contato</ContactButtonText>
+      </ContactButtonContainer>
     </Container>
   </>
 );

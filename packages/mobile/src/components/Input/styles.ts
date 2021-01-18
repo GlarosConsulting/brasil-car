@@ -11,7 +11,7 @@ export const Container = styled.View<IContainerProps>`
   height: 60px;
   padding: 0 16px;
   background: #d2dae2;
-  border-radius: 10px;
+  border-radius: 8px;
   margin-bottom: 8px;
 
   flex-direction: row;

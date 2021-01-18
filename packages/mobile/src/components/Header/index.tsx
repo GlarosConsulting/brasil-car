@@ -4,9 +4,10 @@ import Icon from 'react-native-vector-icons/Feather';
 
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 
+import logoImg from '../../assets/logo.png';
 import { useAuth } from '../../hooks/auth';
 
-import { Container, UserLabel } from './styles';
+import { Container, UserLabel, Left, LogoImage } from './styles';
 
 const Header: React.FC = () => {
   const { user } = useAuth();
@@ -15,9 +16,15 @@ const Header: React.FC = () => {
 
   return (
     <Container>
-      <TouchableOpacity onPress={() => dispatch(DrawerActions.toggleDrawer())}>
-        <Icon name="menu" size={32} color="#fff" />
-      </TouchableOpacity>
+      <Left>
+        <TouchableOpacity
+          onPress={() => dispatch(DrawerActions.toggleDrawer())}
+        >
+          <Icon name="menu" size={32} color="#fff" />
+        </TouchableOpacity>
+
+        <LogoImage source={logoImg} />
+      </Left>
 
       <UserLabel>Bem vindo, {user?.displayName}</UserLabel>
     </Container>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { StatusBar } from 'react-native';
 
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
@@ -14,15 +15,19 @@ const AppRoutes: React.FC = () => {
   const auth = useAuth();
 
   return (
-    <Drawer.Navigator
-      initialRouteName="Home"
-      drawerContent={CustomDrawer(auth)}
-    >
-      <Drawer.Screen name="Home" component={Home} />
-      <Drawer.Screen name="Inspection" component={Inspection} />
+    <>
+      <StatusBar backgroundColor="#344c66" barStyle="light-content" />
 
-      <Drawer.Screen name="SignIn" component={SignIn} />
-    </Drawer.Navigator>
+      <Drawer.Navigator
+        initialRouteName="Home"
+        drawerContent={CustomDrawer(auth)}
+      >
+        <Drawer.Screen name="Home" component={Home} />
+        <Drawer.Screen name="Inspection" component={Inspection} />
+
+        <Drawer.Screen name="SignIn" component={SignIn} />
+      </Drawer.Navigator>
+    </>
   );
 };
 

@@ -15,11 +15,16 @@ import {
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 
+interface ISignUpData {
+  name: string;
+  email: string;
+  password: string;
+}
 export interface IAuthContextData {
   user?: FirebaseAuthTypes.User;
   loading: boolean;
   signInWithEmailAndPassword(email: string, password: string): Promise<void>;
-  signUp(email: string, password: string): Promise<void>;
+  signUp(data: ISignUpData): Promise<void>;
   signOut(): Promise<void>;
   signInWithGoogle(): Promise<void>;
   signInWithPhoneNumber(
@@ -72,20 +77,27 @@ export const AuthProvider: React.FC = ({ children }) => {
     }
   }, []);
 
-  const signUp = useCallback(async (email, password): Promise<void> => {
-    try {
-      const { user: newUser } = await auth().createUserWithEmailAndPassword(
-        email,
-        password,
-      );
+  const signUp = useCallback(
+    async ({ name, email, password }: ISignUpData): Promise<void> => {
+      try {
+        const { user: newUser } = await auth().createUserWithEmailAndPassword(
+          email,
+          password,
+        );
 
-      await database().ref(`users/${newUser.uid}`).set({
-        company: 'brasil-car',
-      });
-    } catch (error) {
-      throw new Error('error');
-    }
-  }, []);
+        await newUser.updateProfile({
+          displayName: name,
+        });
+
+        await database().ref(`users/${newUser.uid}`).set({
+          company: 'brasil-car',
+        });
+      } catch (error) {
+        throw new Error('error');
+      }
+    },
+    [],
+  );
 
   const signOut = useCallback(async () => {
     try {

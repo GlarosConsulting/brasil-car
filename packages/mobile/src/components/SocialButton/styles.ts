@@ -7,7 +7,7 @@ export default StyleSheet.create({
     height: 56,
     padding: 10,
     flexDirection: 'row',
-    borderRadius: 10,
+    borderRadius: 8,
   },
   iconWrapper: {
     width: 30,

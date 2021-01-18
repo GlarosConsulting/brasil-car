@@ -6,7 +6,7 @@ import styled from 'styled-components/native';
 export const Container = styled.View`
   flex: 1;
   align-items: center;
-  padding: 0 30px ${Platform.OS === 'android' ? 150 : 40}px;
+  padding: 0 32px ${Platform.OS === 'android' ? 150 : 40}px;
   justify-content: center;
 `;
 

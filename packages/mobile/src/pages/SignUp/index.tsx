@@ -29,14 +29,18 @@ import {
 } from './styles';
 
 interface ISignUpFormData {
+  name: string;
   email: string;
   password: string;
 }
 
 const SignUp: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
+
+  const nameInputRef = useRef<TextInput>(null);
   const emailInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
+
   const { signUp, signInWithGoogle } = useAuth();
 
   const navigation = useNavigation();
@@ -47,6 +51,7 @@ const SignUp: React.FC = () => {
         formRef.current?.setErrors({});
 
         const schema = Yup.object().shape({
+          name: Yup.string().required('Nome obrigatório'),
           email: Yup.string()
             .required('E-mail obrigatório')
             .email('Digite um e-mail válido'),
@@ -57,7 +62,7 @@ const SignUp: React.FC = () => {
           abortEarly: false,
         });
 
-        await signUp(data.email, data.password);
+        await signUp(data);
 
         navigation.navigate('SignIn');
 
@@ -99,6 +104,19 @@ const SignUp: React.FC = () => {
           </View>
 
           <Form ref={formRef} onSubmit={handleSignUp} style={{ width: '100%' }}>
+            <Input
+              ref={nameInputRef}
+              autoCapitalize="words"
+              placeholder="Seu nome"
+              name="name"
+              icon="user"
+              keyboardType="default"
+              returnKeyType="next"
+              onSubmitEditing={() => {
+                emailInputRef.current?.focus();
+              }}
+            />
+
             <Input
               ref={emailInputRef}
               autoCorrect={false}
@@ -147,7 +165,7 @@ const SignUp: React.FC = () => {
 
             <SocialButton
               iconType="feather"
-              buttonTitle="Entrar com o Telefone"
+              buttonTitle="Entrar com o telefone"
               btnType="phone"
               color="#617feb"
               backgroundColor="#e7eaf5"
