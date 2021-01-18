@@ -1,54 +1,93 @@
+import { useRouter } from 'next/router';
 import React, { useCallback, useRef } from 'react';
 import { FiUpload } from 'react-icons/fi';
 
 import { Box, useToast, Button, Text, Flex, Tooltip } from '@chakra-ui/core';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
-import * as Yup from 'yup';
 
 import Dropzone from '@/components/Dropzone';
 import Header from '@/components/Header';
 import SEO from '@/components/SEO';
 import Sidebar from '@/components/Sidebar';
-import getValidationErrors from '@/utils/getValidationErrors';
+import { useAuthentication } from '@/context/authentication';
+import api from '@/services/api';
+import isRetFile from '@/utils/IsRetFile';
 
-const SUPPORTED_FORMATS = ['text/richtext'];
 const InsertReturnFiles: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
+  const router = useRouter();
+
+  const { user, isLoggedIn } = useAuthentication();
   const toast = useToast();
 
   const handleSubmit = useCallback(async data => {
-    try {
-      formRef.current?.setErrors({});
+    formRef.current?.setErrors({});
 
-      const schemaFile = Yup.object().shape({
-        file: Yup.mixed().test(
-          'fileType',
-          'O formato do arquivo deve ser uma imagem.',
-          value => SUPPORTED_FORMATS.includes(value.type),
-        ),
+    if (!data.file) {
+      formRef.current.setErrors({ file: 'the file is required.' });
+
+      toast({
+        position: 'top',
+        status: 'error',
+        title: 'Nenhum arquivo detectado.',
+        description:
+          'Por favor importe o arquivo desejado clicando na zona de importação, ou clicando na mesma.',
       });
 
-      await schemaFile.validate(data, { abortEarly: false });
+      return;
+    }
 
-      console.log('enviado com sucesso.');
+    const isRet = isRetFile(data.file.name);
+
+    if (!isRet) {
+      toast({
+        position: 'top',
+        status: 'error',
+        title: 'Arquivo inválido.',
+        description: 'O arquivo selecionado deve ser do tipo ret.',
+      });
+
+      return;
+    }
+
+    if (!user.data?.uid || !isLoggedIn) {
+      toast({
+        position: 'top',
+        status: 'error',
+        title: 'Arquivo inválido.',
+        description: 'O arquivo selecionado deve ser do tipo ret.',
+      });
+
+      return;
+    }
+
+    const formData = new FormData();
+
+    formData.append('file', data.file);
+    formData.append('user_id', user.data.uid);
+
+    try {
+      api.post('return-files', formData, {
+        headers: {
+          'content-type': 'multipart/form-data',
+        },
+      });
+
+      router.replace('cash-handling');
+
+      toast({
+        position: 'top',
+        status: 'success',
+        title: 'Arquivo importado com sucesso.',
+      });
     } catch (err) {
-      if (err instanceof Yup.ValidationError) {
-        const errors = getValidationErrors(err);
-
-        console.log(errors);
-
-        if (errors.file === 'O arquivo deve ser uma imagem.') {
-          toast({
-            position: 'top-right',
-            status: 'error',
-            title: 'Arquivo inválido.',
-            description: 'O arquivo selecionado deve ser uma imagem.',
-          });
-        }
-
-        formRef.current?.setErrors(errors);
-      }
+      toast({
+        position: 'top',
+        status: 'error',
+        title: 'Não foi possível realizar a importação.',
+        description: 'Ocorreu um erro, tente novamente.',
+      });
     }
   }, []);
 
