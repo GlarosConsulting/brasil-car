@@ -5,15 +5,34 @@ import styled from 'styled-components/native';
 
 export const Container = styled.View`
   flex: 1;
+  padding: 0 30px ${Platform.OS === 'android' ? 48 : 40}px;
+
   align-items: center;
-  padding: 0 30px ${Platform.OS === 'android' ? 150 : 40}px;
   justify-content: center;
 `;
 
-export const Title = styled.Text`
-  font-size: 24px;
+export const FormContainer = styled.View`
+  background: #344c66;
+  border-radius: 8px;
+  padding: 24px;
+
+  width: 100%;
+
+  align-items: center;
+`;
+
+export const LogoImage = styled.Image`
+  margin-top: 8px;
+  margin-bottom: 24px;
+`;
+
+export const ForgotPassword = styled.TouchableOpacity`
+  margin-top: 24px;
+`;
+
+export const ForgotPasswordText = styled.Text`
   color: #fff;
-  margin: 64px 0 24px;
+  font-size: 16px;
 `;
 
 export const CreateAccount = styled.TouchableOpacity`
@@ -39,13 +58,4 @@ export const CreateAccountText = styled.Text`
 
 export const SocialButtonsContainer = styled.View`
   margin-top: 24px;
-`;
-
-export const ForgotPassword = styled.TouchableOpacity`
-  margin-top: 24px;
-`;
-
-export const ForgotPasswordText = styled.Text`
-  color: #f4ede8;
-  font-size: 16px;
 `;
