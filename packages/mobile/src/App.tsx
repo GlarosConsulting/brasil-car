@@ -5,8 +5,8 @@ import { requestMultiple, PERMISSIONS } from 'react-native-permissions';
 
 import { NavigationContainer } from '@react-navigation/native';
 
-import CustomDrawer from './components/CustomDrawer';
 import AppProvider from './hooks';
+import Routes from './routes';
 
 const App = () => {
   useEffect(() => {
@@ -17,11 +17,11 @@ const App = () => {
   }, []);
 
   return (
-    <AppProvider>
-      <NavigationContainer>
-        <CustomDrawer />
-      </NavigationContainer>
-    </AppProvider>
+    <NavigationContainer>
+      <AppProvider>
+        <Routes />
+      </AppProvider>
+    </NavigationContainer>
   );
 };
 

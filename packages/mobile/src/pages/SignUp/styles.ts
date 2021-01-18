@@ -12,18 +12,18 @@ export const Container = styled.View`
 
 export const Title = styled.Text`
   font-size: 24px;
-  color: #fff;
+  color: #000;
   margin: 64px 0 24px;
 `;
 
-export const CreateAccount = styled.TouchableOpacity`
+export const BackToSignIn = styled.TouchableOpacity`
   position: absolute;
   left: 0;
   bottom: 0;
   right: 0;
-  background: #454545;
+  background: #485460;
   border-top-width: 1px;
-  border-color: #fff;
+  border-color: #e1e1e6;
   padding: 16px 0 ${16 + getBottomSpace()}px;
 
   justify-content: center;
@@ -31,7 +31,7 @@ export const CreateAccount = styled.TouchableOpacity`
   flex-direction: row;
 `;
 
-export const CreateAccountText = styled.Text`
+export const BackToSignInText = styled.Text`
   color: #fff;
   font-size: 18px;
   margin-left: 16px;
@@ -39,13 +39,4 @@ export const CreateAccountText = styled.Text`
 
 export const SocialButtonsContainer = styled.View`
   margin-top: 24px;
-`;
-
-export const ForgotPassword = styled.TouchableOpacity`
-  margin-top: 24px;
-`;
-
-export const ForgotPasswordText = styled.Text`
-  color: #f4ede8;
-  font-size: 16px;
 `;
