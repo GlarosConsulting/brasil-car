@@ -6,7 +6,7 @@ import { Column } from 'react-table';
 import { Box, Button, Flex, Text, Tooltip } from '@chakra-ui/core';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
-import { format, isWithinInterval } from 'date-fns';
+import { format } from 'date-fns';
 
 import DatePicker from '@/components/DatePicker';
 import Header from '@/components/Header';
@@ -14,7 +14,6 @@ import Select from '@/components/Select';
 import SEO from '@/components/SEO';
 import Sidebar from '@/components/Sidebar';
 import Table from '@/components/Table';
-import inspectionsData from '@/mocks/Inspections';
 import api from '@/services/api';
 import getStatusFromInspections from '@/utils/getStatusFromInspections';
 
