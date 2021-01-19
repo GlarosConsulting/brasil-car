@@ -1,3 +1,4 @@
+import { endOfDay, startOfDay } from 'date-fns';
 import { injectable, inject } from 'tsyringe';
 
 import Inspection, {
@@ -24,8 +25,8 @@ class ListInspectionsService {
     status,
   }: IRequest): Promise<Inspection[]> {
     const inspections = await this.inspectionsRepository.findAll({
-      start_date,
-      end_date,
+      start_date: start_date ? startOfDay(start_date) : undefined,
+      end_date: end_date ? endOfDay(end_date) : undefined,
       status,
     });
 

@@ -7,9 +7,9 @@ const firebaseUsersRouter = Router();
 const firebaseUsersController = new FirebaseUsersController();
 
 firebaseUsersRouter.get(
-  '/',
+  '/:uid',
   celebrate({
-    [Segments.QUERY]: {
+    [Segments.PARAMS]: {
       uid: Joi.string().required(),
     },
   }),

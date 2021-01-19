@@ -4,7 +4,7 @@ import SEO from '@/components/SEO';
 
 const Home: React.FC = () => (
   <>
-    <SEO title="Brasil car" image="og/boost.png" shouldExcludeTitleSuffix />
+    <SEO title="Brasil Car" image="og/boost.png" shouldExcludeTitleSuffix />
   </>
 );
 

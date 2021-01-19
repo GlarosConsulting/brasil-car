@@ -33,12 +33,13 @@ interface IInspection {
 }
 
 interface IFormData {
-  initialDate: Date;
-  finalDate: Date;
+  start_date: Date;
+  end_date: Date;
   status: 'pending' | 'approved' | 'refused';
 }
 
 interface IFirebaseUser {
+  uid: string;
   displayName: string;
 }
 
@@ -64,81 +65,62 @@ const INSPECTIONS_TABLE_COLUMNS = [
 const Inspections: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
-  const [tableData, setDataTable] = useState<IInspection[]>([]);
-
-  const formattedTableData: Promise<{
-    name: string;
-    send_date: string;
-    limit_date: string;
-    status: JSX.Element;
-  }>[] = useMemo(
-    () =>
-      tableData &&
-      tableData.map(async row => {
-        const status = getStatusFromInspections(row.status);
-
-        const response = await api.get<IFirebaseUser>('firebase-users', {
-          params: { uid: row.user_id },
-        });
-
-        return {
-          name: response.data.displayName,
-          send_date: format(new Date(row.created_at), 'dd/MM/yyyy'),
-          limit_date: format(new Date(row.limit_date), 'dd/MM/yyyy'),
-          status: status && <Text color={status.color}>{status.status}</Text>,
-        };
-      }),
-    [tableData],
-  );
+  const [inspections, setInspections] = useState<IInspection[]>([]);
+  const [firebaseUsers, setFirebaseUsers] = useState<IFirebaseUser[]>([]);
 
   useEffect(() => {
-    api.get<IInspection[]>('inspections').then(response => {
-      setDataTable(response.data);
-    });
+    async function loadInspections() {
+      const { data: newInspections } = await api.get<IInspection[]>(
+        '/inspections',
+      );
+
+      setInspections(newInspections);
+    }
+
+    loadInspections();
   }, []);
 
-  const handleSearch = useCallback(
-    ({ initialDate, finalDate, status }: IFormData) => {
-      let filteredData = [];
+  useEffect(() => {
+    async function loadFirebaseUsers() {
+      const firebaseUserIds = inspections.map(item => item.user_id);
 
-      if (initialDate && finalDate && status) {
-        filteredData = inspectionsData.filter(inspection => {
-          if (
-            isWithinInterval(inspection.send_date, {
-              start: initialDate,
-              end: finalDate,
-            }) &&
-            inspection.status === status
-          ) {
-            return true;
-          }
+      for (const id of firebaseUserIds) {
+        let newFirebaseUser: IFirebaseUser;
 
-          return false;
-        });
-      } else if (!initialDate && !finalDate && status) {
-        filteredData = inspectionsData.filter(inspection => {
-          if (inspection.status === status) {
-            return true;
-          }
+        try {
+          const { data: firebaseUser } = await api.get<IFirebaseUser>(
+            `/firebase-users/${id}`,
+          );
 
-          return false;
-        });
-      } else if (initialDate && finalDate && !status) {
-        filteredData = inspectionsData.filter(inspection => {
-          if (
-            isWithinInterval(inspection.send_date, {
-              start: initialDate,
-              end: finalDate,
-            })
-          ) {
-            return true;
-          }
+          newFirebaseUser = firebaseUser;
+        } catch {
+          newFirebaseUser = {
+            uid: id,
+            displayName: 'Não encontrado',
+          };
+        }
 
-          return false;
-        });
+        setFirebaseUsers(state => [...state, newFirebaseUser]);
       }
+    }
 
-      setDataTable(filteredData);
+    loadFirebaseUsers();
+  }, [inspections]);
+
+  const handleSearch = useCallback(
+    async ({ start_date, end_date, status }: IFormData) => {
+      const { data: newInspections } = await api.get<IInspection[]>(
+        '/inspections',
+        {
+          params: {
+            start_date,
+            end_date,
+            status: status.length ? status : undefined,
+          },
+        },
+      );
+
+      setInspections(newInspections);
     },
     [],
   );
@@ -148,6 +130,25 @@ const Inspections: React.FC = () => {
 
     formRef.current.reset();
   }, []);
+
+  const formattedInspections = useMemo(
+    () =>
+      inspections?.map(row => {
+        const status = getStatusFromInspections(row.status);
+
+        const firebaseUser = firebaseUsers.find(
+          user => user.uid === row.user_id,
+        );
+
+        return {
+          name: firebaseUser?.displayName || 'Carregando...',
+          send_date: format(new Date(row.created_at), 'dd/MM/yyyy'),
+          limit_date: format(new Date(row.limit_date), 'dd/MM/yyyy'),
+          status: status && <Text color={status.color}>{status.status}</Text>,
+        };
+      }) || [],
+    [firebaseUsers, inspections],
+  );
 
   return (
     <>
@@ -170,29 +171,22 @@ const Inspections: React.FC = () => {
               css={{ display: 'flex', marginBottom: 16 }}
             >
               <DatePicker
-                // initialDate={initialData && new Date(initialData.firstDate)}
-                // minDate={minAndMaxValue && new Date(minAndMaxValue.minDate)}
-                // maxDate={minAndMaxValue && new Date(minAndMaxValue.maxDate)}
+                placeholderText="Data de início"
+                name="start_date"
                 containerProps={{ color: '#000', background: '#CBD5E0' }}
-                placeholderText="Data Inicial"
-                name="initialDate"
-                className="initialDate"
               />
+
               <DatePicker
-                // initialDate={initialData && new Date(initialData.lastDate)}
-                // minDate={minAndMaxValue && new Date(minAndMaxValue.minDate)}
-                // maxDate={minAndMaxValue && new Date(minAndMaxValue.maxDate)}
+                placeholderText="Data de fim"
+                name="end_date"
                 containerProps={{
                   background: '#CBD5E0',
                   marginLeft: 6,
                 }}
-                placeholderText="Data Final"
-                name="finalDate"
-                className="finalDate"
               />
 
               <Select
-                placeholder="Status"
+                placeholder="Situação"
                 backgroundColor="#CBD5E0"
                 name="status"
                 containerProps={{
@@ -219,7 +213,7 @@ const Inspections: React.FC = () => {
                 </Button>
               </Tooltip>
 
-              <Tooltip label="Limpar Filtros" aria-label="Limpar Filtros">
+              <Tooltip label="Limpar filtros" aria-label="Limpar filtros">
                 <Button
                   onClick={handleCleanFilters}
                   height="48px"
@@ -233,7 +227,7 @@ const Inspections: React.FC = () => {
 
             <Table
               flex={1}
-              data={formattedTableData}
+              data={formattedInspections}
               width="100%"
               maxHeight={{
                 xs: '20vh',
