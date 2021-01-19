@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import { FiSearch, FiX } from 'react-icons/fi';
 import { Column } from 'react-table';
 
@@ -14,11 +15,19 @@ import SEO from '@/components/SEO';
 import Sidebar from '@/components/Sidebar';
 import Table from '@/components/Table';
 import inspectionsData from '@/mocks/Inspections';
+import api from '@/services/api';
 import getStatusFromInspections from '@/utils/getStatusFromInspections';
 
-interface IInspectionsData {
+interface IFormattedInspection {
   name: string;
-  send_date: Date;
+  send_date: string;
+  limit_date: string;
+  status: JSX.Element;
+}
+
+interface IInspection {
+  user_id: string;
+  created_at: Date;
   limit_date: Date;
   status: 'pending' | 'approved' | 'refused';
 }
@@ -27,6 +36,10 @@ interface IFormData {
   initialDate: Date;
   finalDate: Date;
   status: 'pending' | 'approved' | 'refused';
+}
+
+interface IFirebaseUser {
+  displayName: string;
 }
 
 const INSPECTIONS_TABLE_COLUMNS = [
@@ -51,24 +64,38 @@ const INSPECTIONS_TABLE_COLUMNS = [
 const Inspections: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
-  const [tableData, setDataTable] = useState<IInspectionsData[]>(
-    inspectionsData,
-  );
+  const [tableData, setDataTable] = useState<IInspection[]>([]);
 
-  const formattedTableData = useMemo(
+  const formattedTableData: Promise<{
+    name: string;
+    send_date: string;
+    limit_date: string;
+    status: JSX.Element;
+  }>[] = useMemo(
     () =>
-      tableData.map(row => {
+      tableData &&
+      tableData.map(async row => {
         const status = getStatusFromInspections(row.status);
 
+        const response = await api.get<IFirebaseUser>('firebase-users', {
+          params: { uid: row.user_id },
+        });
+
         return {
-          name: row.name.toLocaleUpperCase(),
-          send_date: format(new Date(row.send_date), 'dd/MM/yyyy'),
+          name: response.data.displayName,
+          send_date: format(new Date(row.created_at), 'dd/MM/yyyy'),
           limit_date: format(new Date(row.limit_date), 'dd/MM/yyyy'),
           status: status && <Text color={status.color}>{status.status}</Text>,
         };
       }),
     [tableData],
   );
+
+  useEffect(() => {
+    api.get<IInspection[]>('inspections').then(response => {
+      setDataTable(response.data);
+    });
+  }, []);
 
   const handleSearch = useCallback(
     ({ initialDate, finalDate, status }: IFormData) => {
@@ -117,7 +144,9 @@ const Inspections: React.FC = () => {
   );
 
   const handleCleanFilters = useCallback(() => {
-    setDataTable(inspectionsData);
+    // setDataTable(inspectionsData);
+
+    formRef.current.reset();
   }, []);
 
   return (
