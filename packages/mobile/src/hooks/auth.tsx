@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useState,
 } from 'react';
+import { Alert } from 'react-native';
 
 import AsyncStorage from '@react-native-community/async-storage';
 import {
@@ -14,10 +15,16 @@ import {
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 
-interface IAuthContextData {
-  user: FirebaseAuthTypes.UserCredential;
+interface ISignUpData {
+  name: string;
+  email: string;
+  password: string;
+}
+export interface IAuthContextData {
+  user?: FirebaseAuthTypes.User;
+  loading: boolean;
   signInWithEmailAndPassword(email: string, password: string): Promise<void>;
-  signUp(email: string, password: string): Promise<void>;
+  signUp(data: ISignUpData): Promise<void>;
   signOut(): Promise<void>;
   signInWithGoogle(): Promise<void>;
   signInWithPhoneNumber(
@@ -33,17 +40,18 @@ interface IAuthContextData {
 const AuthContext = createContext<IAuthContextData>({} as IAuthContextData);
 
 export const AuthProvider: React.FC = ({ children }) => {
-  const [data, setData] = useState<FirebaseAuthTypes.UserCredential>(
-    {} as FirebaseAuthTypes.UserCredential,
-  );
+  const [user, setUser] = useState<FirebaseAuthTypes.User>();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadStorageData(): Promise<void> {
-      const user = await AsyncStorage.getItem('@BrasilCar:user');
+      const storedUser = await AsyncStorage.getItem('@BrasilCar:user');
 
-      if (user) {
-        setData({ user: JSON.parse(user) });
+      if (storedUser) {
+        setUser(JSON.parse(storedUser) as FirebaseAuthTypes.User);
       }
+
+      setLoading(false);
     }
 
     loadStorageData();
@@ -51,31 +59,45 @@ export const AuthProvider: React.FC = ({ children }) => {
 
   const signInWithEmailAndPassword = useCallback(async (email, password) => {
     try {
-      const user = await auth().signInWithEmailAndPassword(email, password);
+      setLoading(true);
 
-      setData(user);
-
-      await AsyncStorage.setItem('@BrasilCar:user', JSON.stringify(user));
-    } catch (error) {
-      console.log(error);
-      throw new Error('error.');
-    }
-  }, []);
-
-  const signUp = useCallback(async (email, password): Promise<void> => {
-    try {
-      const response = await auth().createUserWithEmailAndPassword(
+      const { user: newUser } = await auth().signInWithEmailAndPassword(
         email,
         password,
       );
 
-      await database().ref(`users/${response.user.uid}`).set({
-        company: 'brasil-car',
-      });
+      setUser(newUser);
+
+      await AsyncStorage.setItem('@BrasilCar:user', JSON.stringify(newUser));
     } catch (error) {
-      throw new Error('error');
+      console.log(error);
+      throw new Error('error.');
+    } finally {
+      setLoading(false);
     }
   }, []);
+
+  const signUp = useCallback(
+    async ({ name, email, password }: ISignUpData): Promise<void> => {
+      try {
+        const { user: newUser } = await auth().createUserWithEmailAndPassword(
+          email,
+          password,
+        );
+
+        await newUser.updateProfile({
+          displayName: name,
+        });
+
+        await database().ref(`users/${newUser.uid}`).set({
+          company: 'brasil-car',
+        });
+      } catch (error) {
+        throw new Error('error');
+      }
+    },
+    [],
+  );
 
   const signOut = useCallback(async () => {
     try {
@@ -85,40 +107,51 @@ export const AuthProvider: React.FC = ({ children }) => {
       } catch (err) {
         await auth().signOut();
       }
+
       await AsyncStorage.removeItem('@BrasilCar:user');
 
-      setData({} as FirebaseAuthTypes.UserCredential);
+      setUser(undefined);
     } catch (error) {
       console.log(error);
     }
-  }, [setData]);
+  }, [setUser]);
 
   const signInWithGoogle = useCallback(async () => {
     try {
+      setLoading(true);
+
       GoogleSignin.configure({
         webClientId:
           '824008646225-5ongm6o09g4fm4npe5qio1fskbv300la.apps.googleusercontent.com',
       });
-      // Get the users ID token
+
       const { idToken } = await GoogleSignin.signIn();
 
-      // Create a Google credential with the token
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
 
-      // Sign-in the user with the credential
-      const user = await auth().signInWithCredential(googleCredential);
+      const { user: newUser } = await auth().signInWithCredential(
+        googleCredential,
+      );
 
-      setData(user);
+      await database().ref(`users/${newUser.uid}`).set({
+        company: 'brasil-car',
+      });
+
+      setUser(newUser as FirebaseAuthTypes.User);
+
+      await AsyncStorage.setItem('@BrasilCar:user', JSON.stringify(newUser));
     } catch (error) {
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        // user cancelled the login flow
-      } else if (error.code === statusCodes.IN_PROGRESS) {
-        // operation (e.g. sign in) is in progress already
-      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        // play services not available or outdated
-      } else {
+      Alert.alert('Ocorreu um erro', JSON.stringify(error));
+
+      if (
+        error.code !== statusCodes.SIGN_IN_CANCELLED ||
+        error.code !== statusCodes.IN_PROGRESS ||
+        error.code !== statusCodes.PLAY_SERVICES_NOT_AVAILABLE
+      ) {
         throw new Error(error);
       }
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -135,7 +168,11 @@ export const AuthProvider: React.FC = ({ children }) => {
           throw new Error('error.');
         }
 
-        setData(response);
+        const { user: newUser } = response;
+
+        setUser(newUser);
+
+        await AsyncStorage.setItem('@BrasilCar:user', JSON.stringify(newUser));
       } catch (error) {
         throw new Error(error);
       }
@@ -147,7 +184,10 @@ export const AuthProvider: React.FC = ({ children }) => {
     async (
       phoneNumber: string,
     ): Promise<FirebaseAuthTypes.ConfirmationResult | undefined> => {
+      setLoading(true);
+
       const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+      setLoading(false);
 
       return confirmation;
     },
@@ -161,7 +201,8 @@ export const AuthProvider: React.FC = ({ children }) => {
   return (
     <AuthContext.Provider
       value={{
-        user: data,
+        user,
+        loading,
         signInWithEmailAndPassword,
         signOut,
         signUp,
