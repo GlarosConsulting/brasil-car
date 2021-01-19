@@ -4,6 +4,7 @@ import { CircleSnail } from 'react-native-progress';
 
 import Header from '../../components/Header';
 import PhotoCard from '../../components/PhotoCard';
+import { useAuth } from '../../hooks/auth';
 import api from '../../services/api';
 
 import {
@@ -15,6 +16,8 @@ import {
 } from './styles';
 
 const Home: React.FC = () => {
+  const { user } = useAuth();
+
   const [forwardPhotoUri, setForwardPhotoUri] = useState<string | null>();
   const [croupPhotoUri, setCroupPhotoUri] = useState<string | null>();
   const [leftSidePhotoUri, setLeftSidePhotoUri] = useState<string | null>();
@@ -58,8 +61,6 @@ const Home: React.FC = () => {
         return;
       }
 
-      const userId = '123456';
-
       const appendImageToFormData = (
         formData: FormData,
         key: string,
@@ -71,14 +72,14 @@ const Home: React.FC = () => {
 
         formData.append(key, {
           type: 'image/jpeg',
-          name: `${key}-${userId}.jpg`,
+          name: `${key}-${user?.uid}.jpg`,
           uri: imageUri,
         } as any);
       };
 
       const data = new FormData();
 
-      data.append('user_id', userId);
+      data.append('user_id', user?.uid || 'not_found');
 
       appendImageToFormData(data, 'forward', forwardPhotoUri);
       appendImageToFormData(data, 'croup', croupPhotoUri);

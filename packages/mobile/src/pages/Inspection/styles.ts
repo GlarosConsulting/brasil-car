@@ -17,7 +17,7 @@ export const Row = styled(GridRow)`
 `;
 
 export const SendButtonContainer = styled.TouchableOpacity`
-  background: #7b84db;
+  background: #344c66;
   width: 100%;
   height: 56px;
 

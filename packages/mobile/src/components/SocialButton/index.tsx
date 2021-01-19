@@ -3,11 +3,12 @@ import {
   Text,
   TouchableOpacity,
   View,
-  StyleSheet,
   TouchableOpacityProps,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+
+import styles from './styles';
 
 interface ISocialButtonProps extends TouchableOpacityProps {
   buttonTitle: string;
@@ -26,35 +27,6 @@ const SocialButton: React.FC<ISocialButtonProps> = ({
   ...rest
 }) => {
   const bgColor = backgroundColor;
-  const styles = StyleSheet.create({
-    buttonContainer: {
-      marginTop: 10,
-      width: '100%',
-      height: 25,
-      padding: 10,
-      flexDirection: 'row',
-      borderRadius: 10,
-    },
-    iconWrapper: {
-      width: 30,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    icon: {
-      fontWeight: 'bold',
-    },
-    btnTxtWrapper: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    buttonText: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      fontFamily: 'Lato-Regular',
-    },
-  });
-
   return (
     <TouchableOpacity
       style={[styles.buttonContainer, { backgroundColor: bgColor }]}

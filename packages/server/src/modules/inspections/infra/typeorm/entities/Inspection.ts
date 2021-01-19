@@ -9,6 +9,7 @@ import {
 
 import formatFileToUrl from '@shared/utils/formatFileToUrl';
 
+export type Status = 'pending' | 'approved' | 'refused';
 @Entity('inspections')
 export default class Inspection {
   @PrimaryGeneratedColumn('uuid')
@@ -16,6 +17,12 @@ export default class Inspection {
 
   @Column()
   user_id: string;
+
+  @Column({ type: 'enum' })
+  status: Status;
+
+  @Column('timestamp with time zone')
+  limit_date: Date;
 
   @Column()
   @Exclude()
@@ -71,43 +78,17 @@ export default class Inspection {
 
   panel_img_url: string | null;
 
-  @Expose({ name: 'forward_img_url' })
-  getForwardImageUrl(): string | null {
-    return formatFileToUrl(this.forward_img);
-  }
-
-  @Expose({ name: 'croup_img_url' })
-  getCroupImageUrl(): string | null {
-    return formatFileToUrl(this.croup_img);
-  }
-
-  @Expose({ name: 'left_side_img_url' })
-  getLeftSideImageUrl(): string | null {
-    return formatFileToUrl(this.left_side_img);
-  }
-
-  @Expose({ name: 'right_side_img_url' })
-  getRightSideImageUrl(): string | null {
-    return formatFileToUrl(this.right_side_img);
-  }
-
-  @Expose({ name: 'motor_img_url' })
-  getMotorImageUrl(): string | null {
-    return formatFileToUrl(this.motor_img);
-  }
-
-  @Expose({ name: 'chassi_img_url' })
-  getChassiImageUrl(): string | null {
-    return formatFileToUrl(this.chassi_img);
-  }
-
-  @Expose({ name: 'document_img_url' })
-  getDocumentImageUrl(): string | null {
-    return formatFileToUrl(this.document_img);
-  }
-
-  @Expose({ name: 'panel_img_url' })
-  getPanelImageUrl(): string | null {
-    return formatFileToUrl(this.panel_img);
+  @Expose({ name: 'images' })
+  getImages(): object {
+    return {
+      forward_img_url: formatFileToUrl(this.forward_img),
+      croup_img_url: formatFileToUrl(this.croup_img),
+      left_side_img_url: formatFileToUrl(this.left_side_img),
+      right_side_img_url: formatFileToUrl(this.right_side_img),
+      motor_img_url: formatFileToUrl(this.motor_img),
+      chassi_img_url: formatFileToUrl(this.chassi_img),
+      document_img_url: formatFileToUrl(this.document_img),
+      panel_img_url: formatFileToUrl(this.panel_img),
+    };
   }
 }

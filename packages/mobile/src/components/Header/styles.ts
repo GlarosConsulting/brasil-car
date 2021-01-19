@@ -1,7 +1,7 @@
 import styled from 'styled-components/native';
 
 export const Container = styled.View`
-  background: #35459e;
+  background: #344c66;
   height: 64px;
 
   flex-direction: row;
@@ -11,7 +11,19 @@ export const Container = styled.View`
   padding: 0 16px;
 `;
 
+export const Left = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;
+
+export const LogoImage = styled.Image`
+  width: 80px;
+  height: 40px;
+
+  margin-left: 20px;
+`;
+
 export const UserLabel = styled.Text`
   color: #fff;
-  font-size: 18px;
+  font-size: 16px;
 `;
