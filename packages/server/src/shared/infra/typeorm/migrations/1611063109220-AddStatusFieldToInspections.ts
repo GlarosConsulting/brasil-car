@@ -9,7 +9,7 @@ export default class AddStatusFieldToInspections1611063109220
         name: 'status',
         type: 'enum',
         enum: ['pending', 'approved', 'refused'],
-        enumName: 'resultEnum',
+        enumName: 'statusEnum',
         default: "'pending'",
       }),
     );
