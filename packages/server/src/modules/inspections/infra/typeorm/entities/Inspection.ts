@@ -9,6 +9,7 @@ import {
 
 import formatFileToUrl from '@shared/utils/formatFileToUrl';
 
+export type Status = 'pending' | 'approved' | 'refused';
 @Entity('inspections')
 export default class Inspection {
   @PrimaryGeneratedColumn('uuid')
@@ -16,6 +17,12 @@ export default class Inspection {
 
   @Column()
   user_id: string;
+
+  @Column({ type: 'enum' })
+  status: Status;
+
+  @Column('timestamp with time zone')
+  limit_date: Date;
 
   @Column()
   @Exclude()

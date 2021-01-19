@@ -11,6 +11,18 @@ const inspectionsController = new InspectionsController();
 
 const upload = multer(uploadConfig.multer);
 
+inspectionsRouter.get(
+  '/',
+  celebrate({
+    [Segments.QUERY]: {
+      start_date: Joi.date(),
+      end_date: Joi.date(),
+      status: Joi.string().valid('pending', 'approved', 'refused'),
+    },
+  }),
+  inspectionsController.index,
+);
+
 inspectionsRouter.post(
   '/',
   upload.fields([

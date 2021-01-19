@@ -1,3 +1,4 @@
+import { addDays, endOfDay } from 'date-fns';
 import { injectable, inject } from 'tsyringe';
 
 import IStorageProvider from '@shared/container/providers/StorageProvider/models/IStorageProvider';
@@ -50,8 +51,11 @@ class CreateInspectionService {
       this.storageProvider.saveFile(filenames.panel),
     ]);
 
+    const limitDate = addDays(endOfDay(Date.now()), 3);
+
     const inspection = await this.inspectionsRepository.create({
       user_id,
+      limit_date: limitDate,
       forward_img: forwardFilename,
       croup_img: croupFilename,
       left_side_img: leftSideFilename,
