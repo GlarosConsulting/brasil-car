@@ -1,3 +1,5 @@
+import { addDays, endOfDay } from 'date-fns';
+
 import FakeStorageProvider from '@shared/container/providers/StorageProvider/fakes/FakeStorageProvider';
 
 import FakeInspectionsRepository from '@modules/inspections/repositories/fakes/FakeInspectionsRepository';
@@ -34,8 +36,11 @@ describe('CreateInspection', () => {
       },
     });
 
+    const limitDate = addDays(endOfDay(Date.now()), 3);
+
     expect(inspection).toEqual(
       expect.objectContaining({
+        limit_date: limitDate,
         forward_img: '',
         croup_img: '',
         left_side_img: '',
