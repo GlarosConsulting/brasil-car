@@ -46,13 +46,13 @@ inspectionsRouter.post(
 );
 
 inspectionsRouter.patch(
-  '/:id',
+  '/status/:id',
   celebrate({
     [Segments.PARAMS]: {
       id: Joi.string().uuid().required(),
     },
     [Segments.BODY]: {
-      status: Joi.string().valid('pending', 'approved', 'refused').required(),
+      status: Joi.string().required().valid('pending', 'approved', 'refused'),
     },
   }),
   inspectionsStatusController.update,

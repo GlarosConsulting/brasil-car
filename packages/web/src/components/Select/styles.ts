@@ -19,7 +19,7 @@ export const Container = styled(Box)<IContainerProps>`
     ${props => transparentize(0.4, props.theme.colors.red[500])};
 
   color: var(--base-color);
-  cursor: text;
+  cursor: pointer;
 
   display: flex;
   align-items: center;
@@ -58,6 +58,14 @@ export const Container = styled(Box)<IContainerProps>`
 
     &::placeholder {
       color: var(--base-color);
+    }
+  }
+
+  > div {
+    cursor: pointer;
+
+    > select {
+      cursor: pointer;
     }
   }
 `;

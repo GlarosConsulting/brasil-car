@@ -8,28 +8,17 @@ import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import { format } from 'date-fns';
 
+import InspectionInfoModal from '@/components/_pages/app/inspections/InspectionInfoModal';
 import DatePicker from '@/components/DatePicker';
 import Header from '@/components/Header';
 import Select from '@/components/Select';
 import SEO from '@/components/SEO';
 import Sidebar from '@/components/Sidebar';
 import Table from '@/components/Table';
+import IFormattedInspection from '@/interfaces/inspections/IFormattedInspection';
+import IInspection from '@/interfaces/inspections/IInspection';
 import api from '@/services/api';
 import getStatusFromInspections from '@/utils/getStatusFromInspections';
-
-interface IFormattedInspection {
-  name: string;
-  send_date: string;
-  limit_date: string;
-  status: JSX.Element;
-}
-
-interface IInspection {
-  user_id: string;
-  created_at: Date;
-  limit_date: Date;
-  status: 'pending' | 'approved' | 'refused';
-}
 
 interface IFormData {
   start_date: Date;
@@ -48,7 +37,7 @@ const INSPECTIONS_TABLE_COLUMNS = [
     accessor: 'name',
   },
   {
-    Header: 'Data envio',
+    Header: 'Data de envio',
     accessor: 'send_date',
   },
   {
@@ -66,6 +55,11 @@ const Inspections: React.FC = () => {
 
   const [inspections, setInspections] = useState<IInspection[]>([]);
   const [firebaseUsers, setFirebaseUsers] = useState<IFirebaseUser[]>([]);
+
+  const [
+    openInspectionInfo,
+    setOpenInspectionInfo,
+  ] = useState<IFormattedInspection>();
 
   useEffect(() => {
     async function loadInspections() {
@@ -124,23 +118,30 @@ const Inspections: React.FC = () => {
     [],
   );
 
-  const handleCleanFilters = useCallback(() => {
-    async function loadInspections() {
-      const { data: newInspections } = await api.get<IInspection[]>(
-        '/inspections',
-      );
+  const handleCleanFilters = useCallback(async () => {
+    const { data: newInspections } = await api.get<IInspection[]>(
+      '/inspections',
+    );
 
-      setInspections(newInspections);
-    }
-
-    loadInspections();
-
-    formRef.current.reset();
+    setInspections(newInspections);
   }, []);
+
+  const handleOpenInspectionInfoModal = useCallback(
+    (formattedInspection: IFormattedInspection) => {
+      setOpenInspectionInfo(formattedInspection);
+    },
+    [],
+  );
+
+  const handleCloseInspectionInfoModal = useCallback(async () => {
+    setOpenInspectionInfo(undefined);
+
+    await handleCleanFilters();
+  }, [handleCleanFilters]);
 
   const formattedInspections: IFormattedInspection[] = useMemo(
     () =>
-      inspections?.map(row => {
+      inspections?.map<IFormattedInspection>(row => {
         const status = getStatusFromInspections(row.status);
 
         const firebaseUser = firebaseUsers.find(
@@ -151,7 +152,8 @@ const Inspections: React.FC = () => {
           name: firebaseUser?.displayName || 'Carregando...',
           send_date: format(new Date(row.created_at), 'dd/MM/yyyy'),
           limit_date: format(new Date(row.limit_date), 'dd/MM/yyyy'),
-          status: status && <Text color={status.color}>{status.status}</Text>,
+          status: status && <Text color={status.color}>{status.label}</Text>,
+          original: row,
         };
       }) || [],
     [firebaseUsers, inspections],
@@ -233,8 +235,14 @@ const Inspections: React.FC = () => {
             </Form>
 
             <Table
-              flex={1}
+              columns={INSPECTIONS_TABLE_COLUMNS}
               data={formattedInspections}
+              onRowClick={row =>
+                handleOpenInspectionInfoModal(
+                  row.original as IFormattedInspection,
+                )
+              }
+              flex={1}
               width="100%"
               maxHeight={{
                 xs: '20vh',
@@ -243,11 +251,16 @@ const Inspections: React.FC = () => {
                 lg: '55vh',
                 xl: '65vh',
               }}
-              columns={INSPECTIONS_TABLE_COLUMNS}
             ></Table>
           </Flex>
         </Flex>
       </Box>
+
+      <InspectionInfoModal
+        isOpen={!!openInspectionInfo}
+        inspection={openInspectionInfo}
+        onClose={handleCloseInspectionInfoModal}
+      />
     </>
   );
 };
