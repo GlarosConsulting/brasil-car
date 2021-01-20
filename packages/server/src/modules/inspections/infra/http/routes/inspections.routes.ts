@@ -52,7 +52,7 @@ inspectionsRouter.patch(
       id: Joi.string().uuid().required(),
     },
     [Segments.BODY]: {
-      status: Joi.string().required(),
+      status: Joi.string().valid('pending', 'approved', 'refused').required(),
     },
   }),
   inspectionsStatusController.update,

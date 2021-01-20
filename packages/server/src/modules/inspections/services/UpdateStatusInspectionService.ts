@@ -27,10 +27,6 @@ class UpdateStatusInspectionService {
       throw new AppError('Inspection not found', 404);
     }
 
-    if (status !== 'pending' && status !== 'refused' && status !== 'approved') {
-      throw new AppError('Invalid status.');
-    }
-
     merge(inspection, { status });
 
     return this.inspectionsRepository.save(inspection);

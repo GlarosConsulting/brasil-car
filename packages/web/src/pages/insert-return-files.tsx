@@ -12,7 +12,7 @@ import SEO from '@/components/SEO';
 import Sidebar from '@/components/Sidebar';
 import { useAuthentication } from '@/context/authentication';
 import api from '@/services/api';
-import isRetFile from '@/utils/IsRetFile';
+import isFileExtension from '@/utils/isFileExtension';
 
 const InsertReturnFiles: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
@@ -38,7 +38,7 @@ const InsertReturnFiles: React.FC = () => {
       return;
     }
 
-    const isRet = isRetFile(data.file.name);
+    const isRet = isFileExtension(data.file.name, 'ret');
 
     if (!isRet) {
       toast({
