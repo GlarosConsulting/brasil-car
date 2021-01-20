@@ -5,9 +5,11 @@ import multer from 'multer';
 import uploadConfig from '@config/upload';
 
 import InspectionsController from '../controllers/InspectionsController';
+import InspectionsStatusController from '../controllers/InspectionsStatusController';
 
 const inspectionsRouter = Router();
 const inspectionsController = new InspectionsController();
+const inspectionsStatusController = new InspectionsStatusController();
 
 const upload = multer(uploadConfig.multer);
 
@@ -41,6 +43,19 @@ inspectionsRouter.post(
     },
   }),
   inspectionsController.create,
+);
+
+inspectionsRouter.patch(
+  '/:id',
+  celebrate({
+    [Segments.PARAMS]: {
+      id: Joi.string().uuid().required(),
+    },
+    [Segments.BODY]: {
+      status: Joi.string().required(),
+    },
+  }),
+  inspectionsStatusController.update,
 );
 
 export default inspectionsRouter;
