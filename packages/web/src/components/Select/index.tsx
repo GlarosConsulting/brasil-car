@@ -14,7 +14,7 @@ interface ISelectProps extends ChakraSelectProps {
   containerProps?: ChakraPseudoBoxProps;
 }
 
-const ReactSelect: React.FC<ISelectProps> = ({
+const Select: React.FC<ISelectProps> = ({
   name,
   children,
   containerProps,
@@ -54,7 +54,6 @@ const ReactSelect: React.FC<ISelectProps> = ({
       width="100%"
       height={12}
       borderRadius="md"
-      paddingLeft={4}
       {...containerProps}
       onClick={() => {
         selectRef.current.focus();
@@ -65,7 +64,7 @@ const ReactSelect: React.FC<ISelectProps> = ({
         bg="green.50"
         border={0}
         focusBorderColor={null}
-        paddingLeft={0}
+        paddingLeft={4}
         onFocus={handleInputFocus}
         onBlur={handleInputBlur}
         ref={selectRef}
@@ -77,4 +76,4 @@ const ReactSelect: React.FC<ISelectProps> = ({
   );
 };
 
-export default ReactSelect;
+export default Select;
