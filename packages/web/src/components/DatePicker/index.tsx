@@ -37,17 +37,11 @@ const DatePicker: React.FC<IDatePickerProps> = ({
       name: fieldName,
       ref: datePickerRef.current,
       path: 'props.selected',
-      clearValue: () => {
+      clearValue() {
         setSelected('');
       },
-      setValue: ref => {
-        if (ref.props.className === 'initialDate') {
-          setSelected(ref.props.minDate);
-        }
-
-        if (ref.props.className === 'finalDate') {
-          setSelected(ref.props.maxDate);
-        }
+      setValue(ref, value) {
+        setSelected(value);
       },
     });
   }, [fieldName, registerField]);

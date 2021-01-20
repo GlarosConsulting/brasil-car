@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useRef } from 'react';
 import { useState } from 'react';
 import { useCallback } from 'react';
+import { useMemo } from 'react';
 import { FiPlus, FiSearch, FiX } from 'react-icons/fi';
 import { Column } from 'react-table';
 
@@ -9,6 +10,7 @@ import { Box, Flex, Text, Button, Tooltip } from '@chakra-ui/core';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import { format } from 'date-fns';
+import { parseISO } from 'date-fns/esm';
 
 import DatePicker from '@/components/DatePicker';
 import Header from '@/components/Header';
@@ -18,7 +20,7 @@ import Table from '@/components/Table';
 import api from '@/services/api';
 import formatRealValue from '@/utils/formatRealValue';
 
-interface IDataTable {
+interface IFormattedCashHandling {
   date: string;
   bank: string;
   return: JSX.Element;
@@ -26,11 +28,16 @@ interface IDataTable {
 }
 
 interface ICashHandling {
-  date: Date;
+  date: string;
   bank_value: number;
   return_value: number;
   bank_tariff_value: number;
   is_previous_balance: boolean;
+}
+
+interface ISearchFormData {
+  start_date: Date;
+  end_date: Date;
 }
 
 const CASH_HANDLING_TABLE_COLUMNS = [
@@ -57,7 +64,8 @@ const CashHandling: React.FC = () => {
 
   const router = useRouter();
 
-  const [dataTable, setDataTable] = useState<IDataTable[]>([] as IDataTable[]);
+  const [cashHandling, setCashHandling] = useState<ICashHandling[]>([]);
+
   const [initialData, setInitialDate] = useState<{
     lastDate: Date;
     firstDate: Date;
@@ -66,151 +74,100 @@ const CashHandling: React.FC = () => {
   const [minAndMaxValue, setMinAndMaxValue] = useState<{
     minDate: Date;
     maxDate: Date;
-  }>({ minDate: new Date(), maxDate: new Date() });
+  }>({
+    minDate: new Date(),
+    maxDate: new Date(),
+  });
 
   useEffect(() => {
-    api.get('/cash-handling').then(response => {
-      const cashHandling: Array<ICashHandling> = response.data;
-
-      setInitialDate({
-        firstDate: cashHandling[0].date,
-        lastDate: cashHandling[cashHandling.length - 1].date,
-      });
-
-      setMinAndMaxValue({
-        minDate: cashHandling[0].date,
-        maxDate: cashHandling[cashHandling.length - 1].date,
-      });
-
-      setDataTable(
-        cashHandling.map(row =>
-          row.is_previous_balance === true
-            ? {
-                date: 'SALDO ANTERIOR',
-                bank: formatRealValue(row.bank_value),
-                return: (
-                  <Text color="blue.400">
-                    {formatRealValue(row.return_value)}
-                  </Text>
-                ),
-                bank_tariff: (
-                  <Text color="red.600">
-                    {formatRealValue(row.bank_tariff_value)}
-                  </Text>
-                ),
-              }
-            : {
-                date: format(new Date(row.date), 'dd/MM/yyyy'),
-                bank: formatRealValue(row.bank_value),
-                return: (
-                  <Text color="blue.400">
-                    {formatRealValue(row.return_value)}
-                  </Text>
-                ),
-                bank_tariff: (
-                  <Text color="red.600">
-                    {formatRealValue(row.bank_tariff_value)}
-                  </Text>
-                ),
-              },
-        ),
+    async function loadCashHandling() {
+      const { data: newCashHandling } = await api.get<ICashHandling[]>(
+        '/cash-handling',
       );
-    });
-  }, []);
 
-  const handleSearchCashHandling = useCallback(data => {
-    api
-      .get('cash-handling', {
-        params: { initialDate: data.initialDate, finalDate: data.finalDate },
-      })
-      .then(response => {
-        const cashHandling = response.data;
-
+      if (newCashHandling.length > 0) {
         setInitialDate({
-          lastDate: data.finalDate,
-          firstDate: data.initialDate,
+          firstDate: parseISO(newCashHandling[0].date),
+          lastDate: parseISO(newCashHandling[newCashHandling.length - 1].date),
         });
 
-        setDataTable(
-          cashHandling.map(row =>
-            row.is_previous_balance === true
-              ? {
-                  date: 'SALDO ANTERIOR',
-                  bank: formatRealValue(row.bank_value),
-                  return: (
-                    <Text color="blue.400">
-                      {formatRealValue(row.return_value)}
-                    </Text>
-                  ),
-                  bank_tariff: (
-                    <Text color="red.600">
-                      {formatRealValue(row.bank_tariff_value)}
-                    </Text>
-                  ),
-                }
-              : {
-                  date: format(new Date(row.date), 'dd/MM/yyyy'),
-                  bank: formatRealValue(row.bank_value),
-                  return: (
-                    <Text color="blue.400">
-                      {formatRealValue(row.return_value)}
-                    </Text>
-                  ),
-                  bank_tariff: (
-                    <Text color="red.600">
-                      {formatRealValue(row.bank_tariff_value)}
-                    </Text>
-                  ),
-                },
-          ),
-        );
-      });
+        setMinAndMaxValue({
+          minDate: parseISO(newCashHandling[0].date),
+          maxDate: parseISO(newCashHandling[newCashHandling.length - 1].date),
+        });
+      }
+
+      setCashHandling(newCashHandling);
+    }
+
+    loadCashHandling();
   }, []);
 
-  const handleCleanFilters = useCallback(() => {
-    api.get('/cash-handling').then(response => {
-      const cashHandling: Array<ICashHandling> = response.data;
-
-      setDataTable(
-        cashHandling.map(row =>
-          row.is_previous_balance === true
-            ? {
-                date: 'SALDO ANTERIOR',
-                bank: formatRealValue(row.bank_value),
-                return: (
-                  <Text color="blue.400">
-                    {formatRealValue(row.return_value)}
-                  </Text>
-                ),
-                bank_tariff: (
-                  <Text color="red.600">
-                    {formatRealValue(row.bank_tariff_value)}
-                  </Text>
-                ),
-              }
-            : {
-                date: format(new Date(row.date), 'dd/MM/yyyy'),
-                bank: formatRealValue(row.bank_value),
-                return: (
-                  <Text color="blue.400">
-                    {formatRealValue(row.return_value)}
-                  </Text>
-                ),
-                bank_tariff: (
-                  <Text color="red.600">
-                    {formatRealValue(row.bank_tariff_value)}
-                  </Text>
-                ),
-              },
-        ),
-      );
-
-      formRef.current.setData({
-        initialDate: initialData.firstDate,
-        finalDate: initialData.lastDate,
+  const handleSearch = useCallback(
+    async ({ start_date, end_date }: ISearchFormData) => {
+      const { data: newCashHandling } = await api.get('cash-handling', {
+        params: {
+          initialDate: start_date,
+          finalDate: end_date,
+        },
       });
+
+      setInitialDate({
+        firstDate: start_date,
+        lastDate: end_date,
+      });
+
+      setCashHandling(newCashHandling);
+    },
+    [],
+  );
+
+  const handleClearFilters = useCallback(async () => {
+    formRef.current.setData({
+      start_date: minAndMaxValue.minDate,
+      end_date: minAndMaxValue.maxDate,
     });
+
+    const { data: newCashHandling } = await api.get('/cash-handling');
+
+    setCashHandling(newCashHandling);
   }, []);
+
+  const formattedCashHandling = useMemo(
+    () =>
+      cashHandling.map<IFormattedCashHandling>(row =>
+        row.is_previous_balance === true
+          ? {
+              date: 'SALDO ANTERIOR',
+              bank: formatRealValue(row.bank_value),
+              return: (
+                <Text color="blue.400">
+                  {formatRealValue(row.return_value)}
+                </Text>
+              ),
+              bank_tariff: (
+                <Text color="red.600">
+                  {formatRealValue(row.bank_tariff_value)}
+                </Text>
+              ),
+            }
+          : {
+              date: format(new Date(row.date), 'dd/MM/yyyy'),
+              bank: formatRealValue(row.bank_value),
+              return: (
+                <Text color="blue.400">
+                  {formatRealValue(row.return_value)}
+                </Text>
+              ),
+              bank_tariff: (
+                <Text color="red.600">
+                  {formatRealValue(row.bank_tariff_value)}
+                </Text>
+              ),
+            },
+      ),
+    [cashHandling],
+  );
 
   return (
     <>
@@ -229,7 +186,7 @@ const CashHandling: React.FC = () => {
           >
             <Form
               ref={formRef}
-              onSubmit={handleSearchCashHandling}
+              onSubmit={handleSearch}
               css={{ display: 'flex', marginBottom: 16 }}
             >
               <Tooltip
@@ -247,26 +204,24 @@ const CashHandling: React.FC = () => {
               </Tooltip>
 
               <DatePicker
-                initialDate={initialData && new Date(initialData.firstDate)}
-                minDate={minAndMaxValue && new Date(minAndMaxValue.minDate)}
-                maxDate={minAndMaxValue && new Date(minAndMaxValue.maxDate)}
+                initialDate={initialData.firstDate}
+                minDate={minAndMaxValue.minDate}
+                maxDate={minAndMaxValue.maxDate}
                 containerProps={{ color: '#000', background: '#CBD5E0' }}
-                placeholderText="Data Inicial"
-                name="initialDate"
-                className="initialDate"
+                placeholderText="Data de início"
+                name="start_date"
               />
               <DatePicker
-                initialDate={initialData && new Date(initialData.lastDate)}
-                minDate={minAndMaxValue && new Date(minAndMaxValue.minDate)}
-                maxDate={minAndMaxValue && new Date(minAndMaxValue.maxDate)}
+                initialDate={initialData.lastDate}
+                minDate={minAndMaxValue.minDate}
+                maxDate={minAndMaxValue.maxDate}
                 containerProps={{
                   color: '#000',
                   background: '#CBD5E0',
                   marginLeft: 6,
                 }}
-                placeholderText="Data Final"
-                name="finalDate"
-                className="finalDate"
+                placeholderText="Data de fim"
+                name="end_date"
               />
 
               <Tooltip label="Pesquisar período" aria-label="Pesquisar período">
@@ -282,7 +237,7 @@ const CashHandling: React.FC = () => {
 
               <Tooltip label="Limpar Filtros" aria-label="Limpar Filtros">
                 <Button
-                  onClick={handleCleanFilters}
+                  onClick={handleClearFilters}
                   height="48px"
                   backgroundColor="gray.300"
                   marginLeft={4}
@@ -294,7 +249,7 @@ const CashHandling: React.FC = () => {
 
             <Table
               flex={1}
-              data={dataTable}
+              data={formattedCashHandling}
               width="100%"
               maxHeight={{
                 xs: '20vh',
