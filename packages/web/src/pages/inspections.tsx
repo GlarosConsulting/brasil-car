@@ -133,9 +133,11 @@ const Inspections: React.FC = () => {
     [],
   );
 
-  const handleCloseInspectionInfoModal = useCallback(() => {
+  const handleCloseInspectionInfoModal = useCallback(async () => {
     setOpenInspectionInfo(undefined);
-  }, []);
+
+    await handleCleanFilters();
+  }, [handleCleanFilters]);
 
   const formattedInspections: IFormattedInspection[] = useMemo(
     () =>

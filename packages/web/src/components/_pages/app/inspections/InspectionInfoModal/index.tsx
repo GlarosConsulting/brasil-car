@@ -22,6 +22,7 @@ import { Form } from '@unform/web';
 import Select from '@/components/Select';
 import IFormattedInspection from '@/interfaces/inspections/IFormattedInspection';
 import { Status } from '@/interfaces/inspections/IInspection';
+import api from '@/services/api';
 import getStatusFromInspections from '@/utils/getStatusFromInspections';
 
 import ImageCard from './ImageCard';
@@ -48,17 +49,39 @@ const InspectionInfoModal: React.FC<IInspectionInfoModalProps> = ({
 
   const toast = useToast();
 
-  const handleChangeStatus = useCallback(async ({ status }: IFormData) => {
-    const statusConfig = getStatusFromInspections(status);
+  const handleChangeStatus = useCallback(
+    async ({ status }: IFormData) => {
+      try {
+        await api.patch(`/inspections/status/${inspection?.original?.id}`, {
+          status,
+        });
 
-    toast({
-      duration: 3000,
-      position: 'top',
-      status: 'success',
-      title: 'Vistoria atualizada com sucesso',
-      description: `A situação da vistoria foi alterada para: ${statusConfig.label.toLowerCase()}.`,
-    });
-  }, []);
+        const statusConfig = getStatusFromInspections(status);
+
+        toast({
+          duration: 3000,
+          position: 'top',
+          status: 'success',
+          title: 'Vistoria atualizada com sucesso',
+          description: `A situação da vistoria foi alterada para: ${statusConfig.label.toLowerCase()}.`,
+        });
+
+        if (onClose) {
+          onClose(null);
+        }
+      } catch {
+        toast({
+          duration: 3000,
+          position: 'top',
+          status: 'error',
+          title: 'Ocorreu um erro',
+          description:
+            'Ocorreu um erro ao tentar atualizar a situação da vistoria.',
+        });
+      }
+    },
+    [inspection],
+  );
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -71,7 +94,7 @@ const InspectionInfoModal: React.FC<IInspectionInfoModalProps> = ({
         <Form
           ref={formRef}
           initialData={{
-            status: inspection?.status,
+            status: inspection?.original?.status,
           }}
           onSubmit={handleChangeStatus}
         >
@@ -92,45 +115,50 @@ const InspectionInfoModal: React.FC<IInspectionInfoModalProps> = ({
                 <Text>{inspection?.limit_date}</Text>
               </Stack>
 
+              <Stack spacing={0}>
+                <Heading size="sm">Situação:</Heading>
+                {inspection?.status}
+              </Stack>
+
               <SimpleGrid columns={2} spacing={6} mt={2}>
                 <ImageCard
                   title="Dianteira"
-                  image_url={inspection.original.images.forward_img_url}
+                  image_url={inspection?.original?.images.forward_img_url}
                 />
 
                 <ImageCard
                   title="Traseira"
-                  image_url={inspection.original.images.croup_img_url}
+                  image_url={inspection?.original?.images.croup_img_url}
                 />
 
                 <ImageCard
                   title="Lateral esquerda"
-                  image_url={inspection.original.images.left_side_img_url}
+                  image_url={inspection?.original?.images.left_side_img_url}
                 />
 
                 <ImageCard
                   title="Lateral direita"
-                  image_url={inspection.original.images.right_side_img_url}
+                  image_url={inspection?.original?.images.right_side_img_url}
                 />
 
                 <ImageCard
                   title="Motor"
-                  image_url={inspection.original.images.motor_img_url}
+                  image_url={inspection?.original?.images.motor_img_url}
                 />
 
                 <ImageCard
                   title="Chassi"
-                  image_url={inspection.original.images.chassi_img_url}
+                  image_url={inspection?.original?.images.chassi_img_url}
                 />
 
                 <ImageCard
                   title="Documento"
-                  image_url={inspection.original.images.document_img_url}
+                  image_url={inspection?.original?.images.document_img_url}
                 />
 
                 <ImageCard
                   title="Painel"
-                  image_url={inspection.original.images.panel_img_url}
+                  image_url={inspection?.original?.images.panel_img_url}
                 />
               </SimpleGrid>
 
