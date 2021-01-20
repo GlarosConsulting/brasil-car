@@ -10,6 +10,7 @@ import { Box, Flex, Text, Button, Tooltip } from '@chakra-ui/core';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import { format } from 'date-fns';
+import { parseISO } from 'date-fns/esm';
 
 import DatePicker from '@/components/DatePicker';
 import Header from '@/components/Header';
@@ -27,7 +28,7 @@ interface IFormattedCashHandling {
 }
 
 interface ICashHandling {
-  date: Date;
+  date: string;
   bank_value: number;
   return_value: number;
   bank_tariff_value: number;
@@ -86,13 +87,13 @@ const CashHandling: React.FC = () => {
 
       if (newCashHandling.length > 0) {
         setInitialDate({
-          firstDate: newCashHandling[0].date,
-          lastDate: newCashHandling[newCashHandling.length - 1].date,
+          firstDate: parseISO(newCashHandling[0].date),
+          lastDate: parseISO(newCashHandling[newCashHandling.length - 1].date),
         });
 
         setMinAndMaxValue({
-          minDate: newCashHandling[0].date,
-          maxDate: newCashHandling[newCashHandling.length - 1].date,
+          minDate: parseISO(newCashHandling[0].date),
+          maxDate: parseISO(newCashHandling[newCashHandling.length - 1].date),
         });
       }
 
@@ -112,8 +113,8 @@ const CashHandling: React.FC = () => {
       });
 
       setInitialDate({
-        lastDate: start_date,
-        firstDate: end_date,
+        firstDate: start_date,
+        lastDate: end_date,
       });
 
       setCashHandling(newCashHandling);
@@ -123,8 +124,8 @@ const CashHandling: React.FC = () => {
 
   const handleClearFilters = useCallback(async () => {
     formRef.current.setData({
-      start_date: initialData.firstDate,
-      end_date: initialData.lastDate,
+      start_date: minAndMaxValue.minDate,
+      end_date: minAndMaxValue.maxDate,
     });
 
     const { data: newCashHandling } = await api.get('/cash-handling');
@@ -165,7 +166,7 @@ const CashHandling: React.FC = () => {
               ),
             },
       ),
-    [],
+    [cashHandling],
   );
 
   return (

@@ -125,12 +125,20 @@ const Inspections: React.FC = () => {
   );
 
   const handleCleanFilters = useCallback(() => {
-    // setDataTable(inspectionsData);
+    async function loadInspections() {
+      const { data: newInspections } = await api.get<IInspection[]>(
+        '/inspections',
+      );
+
+      setInspections(newInspections);
+    }
+
+    loadInspections();
 
     formRef.current.reset();
   }, []);
 
-  const formattedInspections = useMemo(
+  const formattedInspections: IFormattedInspection[] = useMemo(
     () =>
       inspections?.map(row => {
         const status = getStatusFromInspections(row.status);
