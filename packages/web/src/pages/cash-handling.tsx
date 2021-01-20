@@ -10,7 +10,7 @@ import { Box, Flex, Text, Button, Tooltip } from '@chakra-ui/core';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import { format } from 'date-fns';
-import { parseISO } from 'date-fns/esm';
+import { parseISO } from 'date-fns';
 
 import DatePicker from '@/components/DatePicker';
 import Header from '@/components/Header';
