@@ -1,6 +1,13 @@
-import { getRepository, Repository } from 'typeorm';
+import {
+  Between,
+  getRepository,
+  LessThan,
+  MoreThan,
+  Repository,
+} from 'typeorm';
 
 import ICreateReturnFilesDTO from '@modules/return_files/dtos/ICreateReturnFilesDTO';
+import IFindAllReturnFilesDTO from '@modules/return_files/dtos/IFIndAllReturnFilesDTO';
 import IReturnFilesRepository from '@modules/return_files/repositories/IReturnFilesRepository';
 
 import ReturnFiles from '../entities/ReturnFiles';
@@ -12,8 +19,29 @@ class ReturnFilesRepository implements IReturnFilesRepository {
     this.ormRepository = getRepository(ReturnFiles);
   }
 
-  public async find(): Promise<ReturnFiles[] | undefined> {
-    const returnFiles = await this.ormRepository.find();
+  public async find({
+    start_date,
+    end_date,
+  }: IFindAllReturnFilesDTO): Promise<ReturnFiles[]> {
+    let dateCriteria;
+
+    if (start_date) {
+      dateCriteria = MoreThan(end_date);
+    }
+
+    if (end_date) {
+      dateCriteria = LessThan(start_date);
+    }
+
+    if (start_date && end_date) {
+      dateCriteria = Between(start_date, end_date);
+    }
+
+    const returnFiles = await this.ormRepository.find({
+      where: {
+        ...(dateCriteria && { created_at: dateCriteria }),
+      },
+    });
 
     return returnFiles;
   }

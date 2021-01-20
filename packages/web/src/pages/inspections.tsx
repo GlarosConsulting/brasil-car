@@ -100,12 +100,6 @@ const Inspections: React.FC = () => {
     loadFirebaseUsers();
   }, [inspections]);
 
-  const handleCleanFilters = useCallback(() => {
-    // setDataTable(inspectionsData);
-
-    formRef.current.reset();
-  }, []);
-
   const handleSearch = useCallback(
     async ({ start_date, end_date, status }: IFormData) => {
       const { data: newInspections } = await api.get<IInspection[]>(
@@ -124,6 +118,14 @@ const Inspections: React.FC = () => {
     [],
   );
 
+  const handleCleanFilters = useCallback(async () => {
+    const { data: newInspections } = await api.get<IInspection[]>(
+      '/inspections',
+    );
+
+    setInspections(newInspections);
+  }, []);
+
   const handleOpenInspectionInfoModal = useCallback(
     (formattedInspection: IFormattedInspection) => {
       setOpenInspectionInfo(formattedInspection);
@@ -135,7 +137,7 @@ const Inspections: React.FC = () => {
     setOpenInspectionInfo(undefined);
   }, []);
 
-  const formattedInspections = useMemo(
+  const formattedInspections: IFormattedInspection[] = useMemo(
     () =>
       inspections?.map<IFormattedInspection>(row => {
         const status = getStatusFromInspections(row.status);
