@@ -4,7 +4,7 @@ import { FlexProps } from '@chakra-ui/core';
 
 import { Container } from './styles';
 
-const Header: React.FC<FlexProps> = ({ height }) => (
+const Footer: React.FC<FlexProps> = ({ height }) => (
   <Container
     height={height}
     position="absolute"
@@ -13,4 +13,4 @@ const Header: React.FC<FlexProps> = ({ height }) => (
   ></Container>
 );
 
-export default Header;
+export default Footer;

@@ -207,21 +207,22 @@ const CashHandling: React.FC = () => {
                 initialDate={initialData.firstDate}
                 minDate={minAndMaxValue.minDate}
                 maxDate={minAndMaxValue.maxDate}
-                containerProps={{ color: '#000', background: '#CBD5E0' }}
                 placeholderText="Data de início"
                 name="start_date"
+                containerProps={{ color: '#000', background: '#CBD5E0' }}
               />
+
               <DatePicker
                 initialDate={initialData.lastDate}
                 minDate={minAndMaxValue.minDate}
                 maxDate={minAndMaxValue.maxDate}
+                placeholderText="Data de fim"
+                name="end_date"
                 containerProps={{
                   color: '#000',
                   background: '#CBD5E0',
                   marginLeft: 6,
                 }}
-                placeholderText="Data de fim"
-                name="end_date"
               />
 
               <Tooltip label="Pesquisar período" aria-label="Pesquisar período">
