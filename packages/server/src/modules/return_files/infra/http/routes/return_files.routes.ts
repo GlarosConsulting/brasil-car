@@ -21,4 +21,15 @@ returnFilesRouter.post(
   returnFilesController.create,
 );
 
+returnFilesRouter.get(
+  '/',
+  celebrate({
+    [Segments.QUERY]: {
+      start_date: Joi.date().allow(null),
+      end_date: Joi.date().allow(null),
+    },
+  }),
+  returnFilesController.index,
+);
+
 export default returnFilesRouter;
