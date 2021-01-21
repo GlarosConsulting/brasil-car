@@ -124,6 +124,8 @@ const Inspections: React.FC = () => {
     );
 
     setInspections(newInspections);
+
+    formRef.current.reset();
   }, []);
 
   const handleOpenInspectionInfoModal = useCallback(
