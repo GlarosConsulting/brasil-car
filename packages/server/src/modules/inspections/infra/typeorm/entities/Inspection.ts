@@ -5,9 +5,12 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 import formatFileToUrl from '@shared/utils/formatFileToUrl';
+
+import Breakdown from './Breakdown';
 
 export type Status = 'pending' | 'approved' | 'refused';
 @Entity('inspections')
@@ -175,6 +178,11 @@ export default class Inspection {
   @Column()
   @Exclude()
   rear_left_buffer_img: string;
+
+  @OneToMany(() => Breakdown, breakdown => breakdown.inspection, {
+    cascade: true,
+  })
+  breakdowns: Breakdown[];
 
   @CreateDateColumn()
   created_at: Date;

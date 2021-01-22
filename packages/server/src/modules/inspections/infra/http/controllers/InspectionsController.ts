@@ -26,56 +26,60 @@ export default class InspectionsController {
       [fieldName: string]: Express.Multer.File[];
     };
 
-    const createInspection = container.resolve(CreateInspectionService);
-
-    const isFilled = (file: Express.Multer.File[]) =>
+    const getFilename = (file: Express.Multer.File[]) =>
       file ? file[0].filename : undefined;
+
+    const getMultipleFilenames = (file: Express.Multer.File[]) =>
+      file ? file.map(fi => fi.filename) : undefined;
+
+    const createInspection = container.resolve(CreateInspectionService);
 
     const inspection = await createInspection.execute({
       user_id,
       filenames: {
-        forward: isFilled(files.forward),
-        croup: isFilled(files.croup),
-        left_side: isFilled(files.left_side),
-        right_side: isFilled(files.right_side),
-        motor: isFilled(files.motor),
-        chassi: isFilled(files.chassi),
-        document: isFilled(files.document),
-        panel: isFilled(files.panel),
-        forward_left: isFilled(files.forward_left),
-        forward_right: isFilled(files.forward_right),
-        rear_left: isFilled(files.rear_left),
-        rear_right: isFilled(files.rear_right),
-        forward_right_with_opened_hood: isFilled(
+        forward: getFilename(files.forward),
+        croup: getFilename(files.croup),
+        left_side: getFilename(files.left_side),
+        right_side: getFilename(files.right_side),
+        motor: getFilename(files.motor),
+        chassi: getFilename(files.chassi),
+        document: getFilename(files.document),
+        panel: getFilename(files.panel),
+        forward_left: getFilename(files.forward_left),
+        forward_right: getFilename(files.forward_right),
+        rear_left: getFilename(files.rear_left),
+        rear_right: getFilename(files.rear_right),
+        forward_right_with_opened_hood: getFilename(
           files.forward_right_with_opened_hood,
         ),
-        forward_left_with_opened_hood: isFilled(
+        forward_left_with_opened_hood: getFilename(
           files.forward_left_with_opened_hood,
         ),
-        forward_with_opened_hood: isFilled(files.forward_with_opened_hood),
-        rear_plate: isFilled(files.rear_plate),
-        opened_trunk: isFilled(files.opened_trunk),
-        seal_plate: isFilled(files.seal_plate),
-        spare_tire: isFilled(files.spare_tire),
-        key: isFilled(files.key),
-        forward_right_wheel: isFilled(files.forward_right_wheel),
-        forward_left_wheel: isFilled(files.forward_left_wheel),
-        rear_left_wheel: isFilled(files.rear_left_wheel),
-        rear_right_wheel: isFilled(files.rear_right_wheel),
-        left_column: isFilled(files.left_column),
-        right_column: isFilled(files.right_column),
-        pedometer: isFilled(files.pedometer),
-        forward_right_tire: isFilled(files.forward_right_tire),
-        forward_left_tire: isFilled(files.forward_left_tire),
-        rear_right_tire: isFilled(files.rear_right_tire),
-        rear_left_tire: isFilled(files.rear_left_tire),
-        console: isFilled(files.console),
-        engine_number: isFilled(files.engine_number),
-        forward_right_buffer: isFilled(files.forward_right_buffer),
-        forward_left_buffer: isFilled(files.forward_left_buffer),
-        rear_right_buffer: isFilled(files.rear_right_buffer),
-        rear_left_buffer: isFilled(files.rear_left_buffer),
+        forward_with_opened_hood: getFilename(files.forward_with_opened_hood),
+        rear_plate: getFilename(files.rear_plate),
+        opened_trunk: getFilename(files.opened_trunk),
+        seal_plate: getFilename(files.seal_plate),
+        spare_tire: getFilename(files.spare_tire),
+        key: getFilename(files.key),
+        forward_right_wheel: getFilename(files.forward_right_wheel),
+        forward_left_wheel: getFilename(files.forward_left_wheel),
+        rear_left_wheel: getFilename(files.rear_left_wheel),
+        rear_right_wheel: getFilename(files.rear_right_wheel),
+        left_column: getFilename(files.left_column),
+        right_column: getFilename(files.right_column),
+        pedometer: getFilename(files.pedometer),
+        forward_right_tire: getFilename(files.forward_right_tire),
+        forward_left_tire: getFilename(files.forward_left_tire),
+        rear_right_tire: getFilename(files.rear_right_tire),
+        rear_left_tire: getFilename(files.rear_left_tire),
+        console: getFilename(files.console),
+        engine_number: getFilename(files.engine_number),
+        forward_right_buffer: getFilename(files.forward_right_buffer),
+        forward_left_buffer: getFilename(files.forward_left_buffer),
+        rear_right_buffer: getFilename(files.rear_right_buffer),
+        rear_left_buffer: getFilename(files.rear_left_buffer),
       },
+      breakdowns: getMultipleFilenames(files.breakdown),
     });
 
     return response.json(classToClass(inspection));

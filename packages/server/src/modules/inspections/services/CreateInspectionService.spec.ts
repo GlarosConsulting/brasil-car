@@ -2,11 +2,13 @@ import { addDays, endOfDay } from 'date-fns';
 
 import FakeStorageProvider from '@shared/container/providers/StorageProvider/fakes/FakeStorageProvider';
 
+import FakeBreakdownsRepository from '@modules/inspections/repositories/fakes/FakeBreakdownsRepository';
 import FakeInspectionsRepository from '@modules/inspections/repositories/fakes/FakeInspectionsRepository';
 
 import CreateInspectionService from './CreateInspectionService';
 
 let fakeInspectionsRepository: FakeInspectionsRepository;
+let fakeBreakdownsRepository: FakeBreakdownsRepository;
 let fakeStorageProvider: FakeStorageProvider;
 let createInspection: CreateInspectionService;
 
@@ -14,9 +16,11 @@ describe('CreateInspection', () => {
   beforeEach(() => {
     fakeInspectionsRepository = new FakeInspectionsRepository();
     fakeStorageProvider = new FakeStorageProvider();
+    fakeBreakdownsRepository = new FakeBreakdownsRepository();
 
     createInspection = new CreateInspectionService(
       fakeInspectionsRepository,
+      fakeBreakdownsRepository,
       fakeStorageProvider,
     );
   });

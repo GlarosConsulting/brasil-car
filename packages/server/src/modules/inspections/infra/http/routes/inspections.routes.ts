@@ -65,6 +65,7 @@ inspectionsRouter.post(
     { name: 'forward_left_buffer', maxCount: 1 },
     { name: 'rear_right_buffer', maxCount: 1 },
     { name: 'rear_left_buffer', maxCount: 1 },
+    { name: 'breakdown' },
   ]),
   celebrate({
     [Segments.BODY]: {
