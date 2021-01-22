@@ -97,6 +97,16 @@ const CustomDrawer = ({ user, signOut }: IAuthContextData) => ({
           <MenuItemContainer>
             <MenuItemLabelContainer
               activeOpacity={0.5}
+              onPress={() => navigate('DetailedInspection')}
+            >
+              <Icon name="image" size={16} />
+              <MenuItemText>Vistoria detalhada</MenuItemText>
+            </MenuItemLabelContainer>
+          </MenuItemContainer>
+
+          <MenuItemContainer>
+            <MenuItemLabelContainer
+              activeOpacity={0.5}
               onPress={() => navigate('Home')}
             >
               <Icon name="align-left" size={16} />
