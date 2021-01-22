@@ -4,7 +4,9 @@ import './providers';
 
 import CashHandlingRepository from '@modules/cash_handling/infra/typeorm/repositories/CashHandlingRepository';
 import ICashHandlingRepository from '@modules/cash_handling/repositories/ICashHandlingRepository';
+import BreakdownsRepository from '@modules/inspections/infra/typeorm/repositories/BreakdownsRepository';
 import InspectionsRepository from '@modules/inspections/infra/typeorm/repositories/InspectionsRepository';
+import IBreakdownsRepository from '@modules/inspections/repositories/IBreakdownsRepository';
 import IInspectionsRepository from '@modules/inspections/repositories/IInspectionsRepository';
 import ReturnFilesRepository from '@modules/return_files/infra/typeorm/repositories/ReturnFilesRepository';
 import IReturnFilesRepository from '@modules/return_files/repositories/IReturnFilesRepository';
@@ -22,4 +24,9 @@ container.registerSingleton<ICashHandlingRepository>(
 container.registerSingleton<IReturnFilesRepository>(
   'ReturnFilesRepository',
   ReturnFilesRepository,
+);
+
+container.registerSingleton<IBreakdownsRepository>(
+  'BreakdownsRepository',
+  BreakdownsRepository,
 );

@@ -1,3 +1,4 @@
+import { Expose } from 'class-transformer';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -22,4 +23,11 @@ export default class ReturnFiles {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @Expose({ name: 'files' })
+  getFileUrl(): string | null {
+    if (!this.name) return null;
+
+    return `${process.env.APP_API_URL}/files/${this.name}`;
+  }
 }

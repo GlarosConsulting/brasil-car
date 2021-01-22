@@ -36,6 +36,36 @@ inspectionsRouter.post(
     { name: 'chassi', maxCount: 1 },
     { name: 'document', maxCount: 1 },
     { name: 'panel', maxCount: 1 },
+    { name: 'forward_left', maxCount: 1 },
+    { name: 'forward_right', maxCount: 1 },
+    { name: 'rear_left', maxCount: 1 },
+    { name: 'rear_right', maxCount: 1 },
+    { name: 'forward_right_with_opened_hood', maxCount: 1 },
+    { name: 'forward_left_with_opened_hood', maxCount: 1 },
+    { name: 'forward_with_opened_hood', maxCount: 1 },
+    { name: 'rear_plate', maxCount: 1 },
+    { name: 'opened_trunk', maxCount: 1 },
+    { name: 'seal_plate', maxCount: 1 },
+    { name: 'spare_tire', maxCount: 1 },
+    { name: 'key', maxCount: 1 },
+    { name: 'forward_right_wheel', maxCount: 1 },
+    { name: 'forward_left_wheel', maxCount: 1 },
+    { name: 'rear_left_wheel', maxCount: 1 },
+    { name: 'rear_right_wheel', maxCount: 1 },
+    { name: 'left_column', maxCount: 1 },
+    { name: 'right_column', maxCount: 1 },
+    { name: 'pedometer', maxCount: 1 },
+    { name: 'forward_right_tire', maxCount: 1 },
+    { name: 'forward_left_tire', maxCount: 1 },
+    { name: 'rear_right_tire', maxCount: 1 },
+    { name: 'rear_left_tire', maxCount: 1 },
+    { name: 'console', maxCount: 1 },
+    { name: 'engine_number', maxCount: 1 },
+    { name: 'forward_right_buffer', maxCount: 1 },
+    { name: 'forward_left_buffer', maxCount: 1 },
+    { name: 'rear_right_buffer', maxCount: 1 },
+    { name: 'rear_left_buffer', maxCount: 1 },
+    { name: 'breakdown' },
   ]),
   celebrate({
     [Segments.BODY]: {
@@ -46,13 +76,13 @@ inspectionsRouter.post(
 );
 
 inspectionsRouter.patch(
-  '/:id',
+  '/status/:id',
   celebrate({
     [Segments.PARAMS]: {
       id: Joi.string().uuid().required(),
     },
     [Segments.BODY]: {
-      status: Joi.string().valid('pending', 'approved', 'refused').required(),
+      status: Joi.string().required().valid('pending', 'approved', 'refused'),
     },
   }),
   inspectionsStatusController.update,

@@ -4,67 +4,233 @@ import { injectable, inject } from 'tsyringe';
 import IStorageProvider from '@shared/container/providers/StorageProvider/models/IStorageProvider';
 
 import Inspection from '@modules/inspections/infra/typeorm/entities/Inspection';
+import IBreakdownsRepository from '@modules/inspections/repositories/IBreakdownsRepository';
 import IInspectionsRepository from '@modules/inspections/repositories/IInspectionsRepository';
+import CreateBreakdownsService from '@modules/inspections/services/CreateBreakdownsService';
 
 interface IRequest {
   user_id: string;
   filenames: {
-    forward: string;
-    croup: string;
-    left_side: string;
-    right_side: string;
-    motor: string;
-    chassi: string;
-    document: string;
-    panel: string;
+    forward?: string;
+    croup?: string;
+    left_side?: string;
+    right_side?: string;
+    motor?: string;
+    chassi?: string;
+    document?: string;
+    panel?: string;
+    forward_left?: string;
+    forward_right?: string;
+    rear_left?: string;
+    rear_right?: string;
+    forward_right_with_opened_hood?: string;
+    forward_left_with_opened_hood?: string;
+    forward_with_opened_hood?: string;
+    rear_plate?: string;
+    opened_trunk?: string;
+    seal_plate?: string;
+    spare_tire?: string;
+    key?: string;
+    forward_right_wheel?: string;
+    forward_left_wheel?: string;
+    rear_left_wheel?: string;
+    rear_right_wheel?: string;
+    left_column?: string;
+    right_column?: string;
+    pedometer?: string;
+    forward_right_tire?: string;
+    forward_left_tire?: string;
+    rear_right_tire?: string;
+    rear_left_tire?: string;
+    console?: string;
+    engine_number?: string;
+    forward_right_buffer?: string;
+    forward_left_buffer?: string;
+    rear_right_buffer?: string;
+    rear_left_buffer?: string;
   };
+  breakdowns?: string[];
+}
+
+interface IFilenames {
+  forward?: string;
+  croup?: string;
+  left_side?: string;
+  right_side?: string;
+  motor?: string;
+  chassi?: string;
+  document?: string;
+  panel?: string;
+  forward_left?: string;
+  forward_right?: string;
+  rear_left?: string;
+  rear_right?: string;
+  forward_right_with_opened_hood?: string;
+  forward_left_with_opened_hood?: string;
+  forward_with_opened_hood?: string;
+  rear_plate?: string;
+  opened_trunk?: string;
+  seal_plate?: string;
+  spare_tire?: string;
+  key?: string;
+  forward_right_wheel?: string;
+  forward_left_wheel?: string;
+  rear_left_wheel?: string;
+  rear_right_wheel?: string;
+  left_column?: string;
+  right_column?: string;
+  pedometer?: string;
+  forward_right_tire?: string;
+  forward_left_tire?: string;
+  rear_right_tire?: string;
+  rear_left_tire?: string;
+  console?: string;
+  engine_number?: string;
+  forward_right_buffer?: string;
+  forward_left_buffer?: string;
+  rear_right_buffer?: string;
+  rear_left_buffer?: string;
 }
 
 @injectable()
 class CreateInspectionService {
+  private createBreakdownService: CreateBreakdownsService;
+
   constructor(
     @inject('InspectionsRepository')
     private inspectionsRepository: IInspectionsRepository,
 
+    @inject('BreakdownsRepository')
+    private breakdownsRepository: IBreakdownsRepository,
+
     @inject('StorageProvider')
     private storageProvider: IStorageProvider,
-  ) {}
+  ) {
+    this.createBreakdownService = new CreateBreakdownsService(
+      breakdownsRepository,
+      storageProvider,
+    );
+  }
 
-  public async execute({ user_id, filenames }: IRequest): Promise<Inspection> {
-    const [
-      forwardFilename,
-      croupFilename,
-      leftSideFilename,
-      rightSideFilename,
-      motorFilename,
-      chassiFilename,
-      documentFilename,
-      panelFilename,
-    ] = await Promise.all([
-      this.storageProvider.saveFile(filenames.forward),
-      this.storageProvider.saveFile(filenames.croup),
-      this.storageProvider.saveFile(filenames.left_side),
-      this.storageProvider.saveFile(filenames.right_side),
-      this.storageProvider.saveFile(filenames.motor),
-      this.storageProvider.saveFile(filenames.chassi),
-      this.storageProvider.saveFile(filenames.document),
-      this.storageProvider.saveFile(filenames.panel),
-    ]);
+  public async execute({
+    user_id,
+    filenames,
+    breakdowns,
+  }: IRequest): Promise<Inspection> {
+    const allFilenames: Array<keyof typeof filenames> = [
+      'forward',
+      'croup',
+      'left_side',
+      'right_side',
+      'motor',
+      'chassi',
+      'document',
+      'panel',
+      'forward_left',
+      'forward_right',
+      'rear_left',
+      'rear_right',
+      'forward_right_with_opened_hood',
+      'forward_left_with_opened_hood',
+      'forward_with_opened_hood',
+      'rear_plate',
+      'opened_trunk',
+      'seal_plate',
+      'spare_tire',
+      'key',
+      'forward_right_wheel',
+      'forward_left_wheel',
+      'rear_left_wheel',
+      'rear_right_wheel',
+      'left_column',
+      'right_column',
+      'pedometer',
+      'forward_right_tire',
+      'forward_left_tire',
+      'rear_right_tire',
+      'rear_left_tire',
+      'console',
+      'engine_number',
+      'forward_right_buffer',
+      'forward_left_buffer',
+      'rear_right_buffer',
+      'rear_left_buffer',
+    ];
+
+    const filledFiles = allFilenames.filter(
+      file => filenames[file] !== undefined,
+    );
+
+    const filledFilenames = filledFiles.map(file =>
+      this.storageProvider.saveFile(filenames[file] as string),
+    );
+
+    const savedFilledFilenames = await Promise.all(filledFilenames);
+
+    const sentFilenames: IFilenames = {};
+
+    for (let i = 0; i < filledFiles.length; i++) {
+      sentFilenames[filledFiles[i]] = savedFilledFilenames[i];
+    }
 
     const limitDate = addDays(endOfDay(Date.now()), 3);
 
     const inspection = await this.inspectionsRepository.create({
       user_id,
       limit_date: limitDate,
-      forward_img: forwardFilename,
-      croup_img: croupFilename,
-      left_side_img: leftSideFilename,
-      right_side_img: rightSideFilename,
-      motor_img: motorFilename,
-      chassi_img: chassiFilename,
-      document_img: documentFilename,
-      panel_img: panelFilename,
+      forward_img: sentFilenames?.forward,
+      croup_img: sentFilenames?.croup,
+      left_side_img: sentFilenames?.left_side,
+      right_side_img: sentFilenames?.right_side,
+      motor_img: sentFilenames?.motor,
+      chassi_img: sentFilenames?.chassi,
+      document_img: sentFilenames?.document,
+      panel_img: sentFilenames?.panel,
+      forward_left_img: sentFilenames?.forward_left,
+      forward_right_img: sentFilenames?.forward_right,
+      rear_left_img: sentFilenames?.rear_left,
+      rear_right_img: sentFilenames?.rear_right,
+      forward_right_with_opened_hood_img:
+        sentFilenames?.forward_right_with_opened_hood,
+      forward_left_with_opened_hood_img:
+        sentFilenames?.forward_left_with_opened_hood,
+      forward_with_opened_hood_img: sentFilenames?.forward_with_opened_hood,
+      rear_plate_img: sentFilenames?.rear_plate,
+      opened_trunk_img: sentFilenames?.opened_trunk,
+      seal_plate_img: sentFilenames?.seal_plate,
+      spare_tire_img: sentFilenames?.spare_tire,
+      key_img: sentFilenames?.key,
+      forward_right_wheel_img: sentFilenames?.forward_right_wheel,
+      forward_left_wheel_img: sentFilenames?.forward_left_wheel,
+      rear_left_wheel_img: sentFilenames?.rear_left_wheel,
+      rear_right_wheel_img: sentFilenames?.rear_right_wheel,
+      left_column_img: sentFilenames?.left_column,
+      right_column_img: sentFilenames?.right_column,
+      pedometer_img: sentFilenames?.pedometer,
+      forward_right_tire_img: sentFilenames?.forward_right_tire,
+      forward_left_tire_img: sentFilenames?.forward_left_tire,
+      rear_right_tire_img: sentFilenames?.rear_right_tire,
+      rear_left_tire_img: sentFilenames?.rear_left_tire,
+      console_img: sentFilenames?.console,
+      engine_number_img: sentFilenames?.engine_number,
+      forward_right_buffer_img: sentFilenames?.forward_right_buffer,
+      forward_left_buffer_img: sentFilenames?.forward_left_buffer,
+      rear_right_buffer_img: sentFilenames?.rear_right_buffer,
+      rear_left_buffer_img: sentFilenames?.rear_left_buffer,
     });
+
+    if (!breakdowns) {
+      return inspection;
+    }
+
+    const breakdownsPromises = breakdowns.map(breakdown =>
+      this.createBreakdownService.execute({
+        img_filename: breakdown,
+        inspection_id: inspection.id,
+      }),
+    );
+
+    await Promise.all(breakdownsPromises);
 
     return inspection;
   }

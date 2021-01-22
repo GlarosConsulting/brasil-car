@@ -5,9 +5,12 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 import formatFileToUrl from '@shared/utils/formatFileToUrl';
+
+import Breakdown from './Breakdown';
 
 export type Status = 'pending' | 'approved' | 'refused';
 @Entity('inspections')
@@ -56,6 +59,131 @@ export default class Inspection {
   @Exclude()
   panel_img: string;
 
+  @Column()
+  @Exclude()
+  forward_left_img: string;
+
+  @Column()
+  @Exclude()
+  forward_right_img: string;
+
+  @Column()
+  @Exclude()
+  rear_left_img: string;
+
+  @Column()
+  @Exclude()
+  rear_right_img: string;
+
+  @Column()
+  @Exclude()
+  forward_right_with_opened_hood_img: string;
+
+  @Column()
+  @Exclude()
+  forward_left_with_opened_hood_img: string;
+
+  @Column()
+  @Exclude()
+  forward_with_opened_hood_img: string;
+
+  @Column()
+  @Exclude()
+  rear_plate_img: string;
+
+  @Column()
+  @Exclude()
+  opened_trunk_img: string;
+
+  @Column()
+  @Exclude()
+  seal_plate_img: string;
+
+  @Column()
+  @Exclude()
+  spare_tire_img: string;
+
+  @Column()
+  @Exclude()
+  key_img: string;
+
+  @Column()
+  @Exclude()
+  forward_right_wheel_img: string;
+
+  @Column()
+  @Exclude()
+  forward_left_wheel_img: string;
+
+  @Column()
+  @Exclude()
+  rear_left_wheel_img: string;
+
+  @Column()
+  @Exclude()
+  rear_right_wheel_img: string;
+
+  @Column()
+  @Exclude()
+  left_column_img: string;
+
+  @Column()
+  @Exclude()
+  right_column_img: string;
+
+  @Column()
+  @Exclude()
+  pedometer_img: string;
+
+  @Column()
+  @Exclude()
+  forward_right_tire_img: string;
+
+  @Column()
+  @Exclude()
+  forward_left_tire_img: string;
+
+  @Column()
+  @Exclude()
+  rear_right_tire_img: string;
+
+  @Column()
+  @Exclude()
+  rear_left_tire_img: string;
+
+  @Column()
+  @Exclude()
+  console_img: string;
+
+  @Column()
+  @Exclude()
+  chassis_img: string;
+
+  @Column()
+  @Exclude()
+  engine_number_img: string;
+
+  @Column()
+  @Exclude()
+  forward_right_buffer_img: string;
+
+  @Column()
+  @Exclude()
+  forward_left_buffer_img: string;
+
+  @Column()
+  @Exclude()
+  rear_right_buffer_img: string;
+
+  @Column()
+  @Exclude()
+  rear_left_buffer_img: string;
+
+  @OneToMany(() => Breakdown, breakdown => breakdown.inspection, {
+    cascade: true,
+  })
+  breakdowns: Breakdown[];
+
   @CreateDateColumn()
   created_at: Date;
 
@@ -89,6 +217,48 @@ export default class Inspection {
       chassi_img_url: formatFileToUrl(this.chassi_img),
       document_img_url: formatFileToUrl(this.document_img),
       panel_img_url: formatFileToUrl(this.panel_img),
+      forward_left_img_url: formatFileToUrl(this.forward_left_img),
+      forward_right_img_url: formatFileToUrl(this.forward_right_img),
+      rear_left_img_url: formatFileToUrl(this.rear_left_img),
+      rear_right_img_url: formatFileToUrl(this.rear_right_img),
+      forward_right_with_opened_hood_img_url: formatFileToUrl(
+        this.forward_right_with_opened_hood_img,
+      ),
+      forward_left_with_opened_hood_img_url: formatFileToUrl(
+        this.forward_left_with_opened_hood_img,
+      ),
+      forward_with_opened_hood_img_url: formatFileToUrl(
+        this.forward_with_opened_hood_img,
+      ),
+      rear_plate_img_url: formatFileToUrl(this.rear_plate_img),
+      opened_trunk_img_url: formatFileToUrl(this.opened_trunk_img),
+      seal_plate_img_url: formatFileToUrl(this.seal_plate_img),
+      spare_tire_img_url: formatFileToUrl(this.spare_tire_img),
+      key_img_url: formatFileToUrl(this.key_img),
+      forward_right_wheel_img_url: formatFileToUrl(
+        this.forward_right_wheel_img,
+      ),
+      forward_left_wheel_img_url: formatFileToUrl(this.forward_left_wheel_img),
+      rear_left_wheel_img_url: formatFileToUrl(this.rear_left_wheel_img),
+      rear_right_wheel_img_url: formatFileToUrl(this.rear_right_wheel_img),
+      left_column_img_url: formatFileToUrl(this.left_column_img),
+      right_column_img_url: formatFileToUrl(this.right_column_img),
+      pedometer_img_url: formatFileToUrl(this.pedometer_img),
+      forward_right_tire_img_url: formatFileToUrl(this.forward_right_tire_img),
+      forward_left_tire_img_url: formatFileToUrl(this.forward_left_tire_img),
+      rear_right_tire_img_url: formatFileToUrl(this.rear_right_tire_img),
+      rear_left_tire_img_url: formatFileToUrl(this.rear_left_tire_img),
+      console_img_url: formatFileToUrl(this.console_img),
+      chassis_img_url: formatFileToUrl(this.chassis_img),
+      engine_number_img_url: formatFileToUrl(this.engine_number_img),
+      forward_right_buffer_img_url: formatFileToUrl(
+        this.forward_right_buffer_img,
+      ),
+      forward_left_buffer_img_url: formatFileToUrl(
+        this.forward_left_buffer_img,
+      ),
+      rear_right_buffer_img_url: formatFileToUrl(this.rear_right_buffer_img),
+      rear_left_buffer_img_url: formatFileToUrl(this.rear_left_buffer_img),
     };
   }
 }
