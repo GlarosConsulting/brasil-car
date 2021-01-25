@@ -1,5 +1,16 @@
 export type Status = 'pending' | 'approved' | 'refused';
 
+interface IBreakdown {
+  id: string;
+  breakdown_url: string;
+}
+
+interface IGlass {
+  id: string;
+  glass_url: string;
+  name: string;
+}
+
 export default interface IInspection {
   id: string;
   user_id: string;
@@ -16,5 +27,7 @@ export default interface IInspection {
     chassi_img_url: string;
     document_img_url: string;
     panel_img_url: string;
+    breakdowns: IBreakdown[];
+    glass: IGlass[];
   };
 }

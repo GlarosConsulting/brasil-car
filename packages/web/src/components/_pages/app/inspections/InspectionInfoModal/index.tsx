@@ -160,6 +160,22 @@ const InspectionInfoModal: React.FC<IInspectionInfoModalProps> = ({
                   title="Painel"
                   image_url={inspection?.original?.images.panel_img_url}
                 />
+
+                {inspection?.original?.images.glass?.map(glass => (
+                  <ImageCard
+                    id={glass.id}
+                    title={glass.name}
+                    image_url={glass.glass_url}
+                  />
+                ))}
+
+                {inspection?.original?.images.breakdowns?.map(breakdown => (
+                  <ImageCard
+                    id={breakdown.id}
+                    title="Avaria"
+                    image_url={breakdown.breakdown_url}
+                  />
+                ))}
               </SimpleGrid>
 
               <Flex mt={4}>
