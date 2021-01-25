@@ -11,6 +11,7 @@ import {
 import formatFileToUrl from '@shared/utils/formatFileToUrl';
 
 import Breakdown from './Breakdown';
+import InspectionGlass from './InspectionGlass';
 
 export type Status = 'pending' | 'approved' | 'refused';
 @Entity('inspections')
@@ -20,6 +21,9 @@ export default class Inspection {
 
   @Column()
   user_id: string;
+
+  @Column()
+  isDetailed: boolean;
 
   @Column({ type: 'enum' })
   status: Status;
@@ -182,7 +186,18 @@ export default class Inspection {
   @OneToMany(() => Breakdown, breakdown => breakdown.inspection, {
     cascade: true,
   })
+  @Exclude()
   breakdowns: Breakdown[];
+
+  @OneToMany(
+    () => InspectionGlass,
+    inspectionGlass => inspectionGlass.inspection,
+    {
+      cascade: true,
+    },
+  )
+  @Exclude()
+  glass: InspectionGlass[];
 
   @CreateDateColumn()
   created_at: Date;
@@ -259,6 +274,8 @@ export default class Inspection {
       ),
       rear_right_buffer_img_url: formatFileToUrl(this.rear_right_buffer_img),
       rear_left_buffer_img_url: formatFileToUrl(this.rear_left_buffer_img),
+      breakdowns: this.breakdowns,
+      glass: this.glass,
     };
   }
 }

@@ -13,10 +13,13 @@ import formatFileToUrl from '@shared/utils/formatFileToUrl';
 
 import Inspection from '@modules/inspections/infra/typeorm/entities/Inspection';
 
-@Entity('breakdowns')
+@Entity('inspections_glass')
 export default class Breakdown {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column()
+  name: string;
 
   @Column()
   @Exclude()
@@ -26,7 +29,7 @@ export default class Breakdown {
   @Exclude()
   inspection_id: string;
 
-  @ManyToOne(() => Inspection, inspection => inspection.breakdowns)
+  @ManyToOne(() => Inspection, inspection => inspection.glass)
   @JoinColumn({ name: 'inspection_id' })
   inspection: Inspection;
 
@@ -40,7 +43,7 @@ export default class Breakdown {
 
   breakdown_url: string | null;
 
-  @Expose({ name: 'breakdown_url' })
+  @Expose({ name: 'glass_url' })
   getImage(): string | null {
     return formatFileToUrl(this.img_filename);
   }

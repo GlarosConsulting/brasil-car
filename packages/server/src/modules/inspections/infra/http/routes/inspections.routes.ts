@@ -4,17 +4,21 @@ import multer from 'multer';
 
 import uploadConfig from '@config/upload';
 
+import DetailedInspectionsController from '../controllers/DetailedInspectionsController';
 import InspectionsController from '../controllers/InspectionsController';
 import InspectionsStatusController from '../controllers/InspectionsStatusController';
+import NotDetailedInspectionsController from '../controllers/NotDetailedInspectionsController';
 
 const inspectionsRouter = Router();
-const inspectionsController = new InspectionsController();
+const notDetailedInspectionsController = new NotDetailedInspectionsController();
+const detailedInspectionsController = new DetailedInspectionsController();
 const inspectionsStatusController = new InspectionsStatusController();
+const inspectionsController = new InspectionsController();
 
 const upload = multer(uploadConfig.multer);
 
 inspectionsRouter.get(
-  '/',
+  '/not-detailed',
   celebrate({
     [Segments.QUERY]: {
       start_date: Joi.date(),
@@ -22,7 +26,19 @@ inspectionsRouter.get(
       status: Joi.string().valid('pending', 'approved', 'refused'),
     },
   }),
-  inspectionsController.index,
+  notDetailedInspectionsController.index,
+);
+
+inspectionsRouter.get(
+  '/detailed',
+  celebrate({
+    [Segments.QUERY]: {
+      start_date: Joi.date(),
+      end_date: Joi.date(),
+      status: Joi.string().valid('pending', 'approved', 'refused'),
+    },
+  }),
+  detailedInspectionsController.index,
 );
 
 inspectionsRouter.post(
@@ -66,10 +82,15 @@ inspectionsRouter.post(
     { name: 'rear_right_buffer', maxCount: 1 },
     { name: 'rear_left_buffer', maxCount: 1 },
     { name: 'breakdown' },
+    { name: 'right_glass' },
+    { name: 'left_glass' },
+    { name: 'forward_glass' },
+    { name: 'rear_glass' },
   ]),
   celebrate({
     [Segments.BODY]: {
       user_id: Joi.string().required(),
+      isDetailed: Joi.boolean().required(),
     },
   }),
   inspectionsController.create,

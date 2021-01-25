@@ -4,11 +4,12 @@ import { Box, Flex, Image, useTheme } from '@chakra-ui/core';
 import { transparentize } from 'polished';
 
 interface IImageCardProps {
+  id?: string;
   title: string;
   image_url: string;
 }
 
-const ImageCard: React.FC<IImageCardProps> = ({ title, image_url }) => {
+const ImageCard: React.FC<IImageCardProps> = ({ id, title, image_url }) => {
   const theme = useTheme();
 
   const handleOpenImage = useCallback(() => {
@@ -17,6 +18,7 @@ const ImageCard: React.FC<IImageCardProps> = ({ title, image_url }) => {
 
   return (
     <Box
+      id={id || ''}
       position="relative"
       borderRadius="md"
       overflow="hidden"

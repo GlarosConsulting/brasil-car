@@ -11,7 +11,7 @@ import IInspectionsRepository from '../IInspectionsRepository';
 class FakeInspectionsRepository implements IInspectionsRepository {
   private inspections: Inspection[] = [];
 
-  public async findAll({
+  public async findAllInspections({
     start_date,
     end_date,
     status,
