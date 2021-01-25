@@ -3,25 +3,10 @@ import { Request, Response } from 'express';
 import { container } from 'tsyringe';
 
 import CreateInspectionService from '@modules/inspections/services/CreateInspectionService';
-import ListInspectionsService from '@modules/inspections/services/ListInspectionsService';
 
 export default class InspectionsController {
-  public async index(request: Request, response: Response): Promise<Response> {
-    const { start_date, end_date, status } = request.query;
-
-    const listInspections = container.resolve(ListInspectionsService);
-
-    const inspections = await listInspections.execute({
-      start_date,
-      end_date,
-      status,
-    } as any);
-
-    return response.json(classToClass(inspections));
-  }
-
   public async create(request: Request, response: Response): Promise<Response> {
-    const { user_id } = request.body;
+    const { user_id, isDetailed } = request.body;
     const files = request.files as {
       [fieldName: string]: Express.Multer.File[];
     };
@@ -36,6 +21,7 @@ export default class InspectionsController {
 
     const inspection = await createInspection.execute({
       user_id,
+      isDetailed,
       filenames: {
         forward: getFilename(files.forward),
         croup: getFilename(files.croup),

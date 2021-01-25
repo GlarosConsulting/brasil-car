@@ -10,6 +10,7 @@ import CreateBreakdownsService from '@modules/inspections/services/CreateBreakdo
 
 interface IRequest {
   user_id: string;
+  isDetailed: boolean;
   filenames: {
     forward?: string;
     croup?: string;
@@ -116,6 +117,7 @@ class CreateInspectionService {
     user_id,
     filenames,
     breakdowns,
+    isDetailed,
   }: IRequest): Promise<Inspection> {
     const allFilenames: Array<keyof typeof filenames> = [
       'forward',
@@ -177,6 +179,7 @@ class CreateInspectionService {
 
     const inspection = await this.inspectionsRepository.create({
       user_id,
+      isDetailed,
       limit_date: limitDate,
       forward_img: sentFilenames?.forward,
       croup_img: sentFilenames?.croup,

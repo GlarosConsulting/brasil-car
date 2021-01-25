@@ -1,6 +1,7 @@
 export default interface ICreateInspectionDTO {
   user_id: string;
   limit_date: Date;
+  isDetailed: boolean;
   forward_img?: string;
   croup_img?: string;
   left_side_img?: string;

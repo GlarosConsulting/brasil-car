@@ -4,4 +4,5 @@ export default interface IFindAllInspectionsDTO {
   start_date?: Date;
   end_date?: Date;
   status?: Status;
+  isDetailed: boolean;
 }

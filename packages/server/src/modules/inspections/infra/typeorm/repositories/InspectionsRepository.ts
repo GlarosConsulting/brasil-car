@@ -18,10 +18,11 @@ class InspectionsRepository implements IInspectionsRepository {
     this.ormRepository = getRepository(Inspection);
   }
 
-  public async findAll({
+  public async findAllInspections({
     start_date,
     end_date,
     status,
+    isDetailed,
   }: IFindAllInspectionsDTO): Promise<Inspection[]> {
     let dateCriteria;
 
@@ -41,6 +42,7 @@ class InspectionsRepository implements IInspectionsRepository {
       where: {
         ...(dateCriteria && { created_at: dateCriteria }),
         ...(status && { status }),
+        ...{ isDetailed },
       },
       relations: ['breakdowns'],
     });

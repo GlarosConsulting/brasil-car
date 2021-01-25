@@ -21,6 +21,9 @@ export default class Inspection {
   @Column()
   user_id: string;
 
+  @Column()
+  isDetailed: boolean;
+
   @Column({ type: 'enum' })
   status: Status;
 
