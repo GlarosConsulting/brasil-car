@@ -66,6 +66,10 @@ export default class InspectionsController {
         rear_left_buffer: getFilename(files.rear_left_buffer),
       },
       breakdowns: getMultipleFilenames(files.breakdown),
+      right_glass: getMultipleFilenames(files.right_glass),
+      left_glass: getMultipleFilenames(files.left_glass),
+      forward_glass: getMultipleFilenames(files.forward_glass),
+      rear_glass: getMultipleFilenames(files.rear_glass),
     });
 
     return response.json(classToClass(inspection));

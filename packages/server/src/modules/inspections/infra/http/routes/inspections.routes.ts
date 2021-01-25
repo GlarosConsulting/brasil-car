@@ -82,6 +82,10 @@ inspectionsRouter.post(
     { name: 'rear_right_buffer', maxCount: 1 },
     { name: 'rear_left_buffer', maxCount: 1 },
     { name: 'breakdown' },
+    { name: 'right_glass' },
+    { name: 'left_glass' },
+    { name: 'forward_glass' },
+    { name: 'rear_glass' },
   ]),
   celebrate({
     [Segments.BODY]: {

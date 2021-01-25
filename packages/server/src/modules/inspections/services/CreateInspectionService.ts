@@ -5,8 +5,10 @@ import IStorageProvider from '@shared/container/providers/StorageProvider/models
 
 import Inspection from '@modules/inspections/infra/typeorm/entities/Inspection';
 import IBreakdownsRepository from '@modules/inspections/repositories/IBreakdownsRepository';
+import IInspectionGlassRepository from '@modules/inspections/repositories/IInspectionGlassRepository';
 import IInspectionsRepository from '@modules/inspections/repositories/IInspectionsRepository';
 import CreateBreakdownsService from '@modules/inspections/services/CreateBreakdownsService';
+import CreateInspectionGlassService from '@modules/inspections/services/CreateInspectionGlassService';
 
 interface IRequest {
   user_id: string;
@@ -51,6 +53,10 @@ interface IRequest {
     rear_left_buffer?: string;
   };
   breakdowns?: string[];
+  right_glass?: string[];
+  left_glass?: string[];
+  forward_glass?: string[];
+  rear_glass?: string[];
 }
 
 interface IFilenames {
@@ -97,12 +103,17 @@ interface IFilenames {
 class CreateInspectionService {
   private createBreakdownService: CreateBreakdownsService;
 
+  private createInspectionGlassService: CreateInspectionGlassService;
+
   constructor(
     @inject('InspectionsRepository')
     private inspectionsRepository: IInspectionsRepository,
 
     @inject('BreakdownsRepository')
     private breakdownsRepository: IBreakdownsRepository,
+
+    @inject('InspectionGlassRepository')
+    private inspectionGlassRepository: IInspectionGlassRepository,
 
     @inject('StorageProvider')
     private storageProvider: IStorageProvider,
@@ -111,12 +122,21 @@ class CreateInspectionService {
       breakdownsRepository,
       storageProvider,
     );
+
+    this.createInspectionGlassService = new CreateInspectionGlassService(
+      inspectionGlassRepository,
+      storageProvider,
+    );
   }
 
   public async execute({
     user_id,
     filenames,
     breakdowns,
+    right_glass,
+    left_glass,
+    forward_glass,
+    rear_glass,
     isDetailed,
   }: IRequest): Promise<Inspection> {
     const allFilenames: Array<keyof typeof filenames> = [
@@ -222,18 +242,64 @@ class CreateInspectionService {
       rear_left_buffer_img: sentFilenames?.rear_left_buffer,
     });
 
-    if (!breakdowns) {
-      return inspection;
+    if (breakdowns) {
+      const breakdownsPromises = breakdowns.map(breakdown =>
+        this.createBreakdownService.execute({
+          img_filename: breakdown,
+          inspection_id: inspection.id,
+        }),
+      );
+
+      await Promise.all(breakdownsPromises);
     }
 
-    const breakdownsPromises = breakdowns.map(breakdown =>
-      this.createBreakdownService.execute({
-        img_filename: breakdown,
-        inspection_id: inspection.id,
-      }),
-    );
+    if (right_glass) {
+      const glassPromises = right_glass.map(rightInspectionGlass =>
+        this.createInspectionGlassService.execute({
+          img_filename: rightInspectionGlass,
+          inspection_id: inspection.id,
+          name: 'lateral direita',
+        }),
+      );
 
-    await Promise.all(breakdownsPromises);
+      await Promise.all(glassPromises);
+    }
+
+    if (left_glass) {
+      const glassPromises = left_glass.map(leftInspectionGlass =>
+        this.createInspectionGlassService.execute({
+          img_filename: leftInspectionGlass,
+          inspection_id: inspection.id,
+          name: 'lateral esquerda',
+        }),
+      );
+
+      await Promise.all(glassPromises);
+    }
+
+    if (forward_glass) {
+      const glassPromises = forward_glass.map(forwardInspectionGlass =>
+        this.createInspectionGlassService.execute({
+          img_filename: forwardInspectionGlass,
+          inspection_id: inspection.id,
+          name: 'dianteira',
+        }),
+      );
+
+      await Promise.all(glassPromises);
+    }
+
+    if (rear_glass) {
+      const glassPromises = rear_glass.map(rearInspectionGlass =>
+        this.createInspectionGlassService.execute({
+          img_filename: rearInspectionGlass,
+          inspection_id: inspection.id,
+          name: 'traseira',
+        }),
+      );
+
+      await Promise.all(glassPromises);
+    }
 
     return inspection;
   }

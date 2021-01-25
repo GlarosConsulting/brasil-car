@@ -11,6 +11,7 @@ import {
 import formatFileToUrl from '@shared/utils/formatFileToUrl';
 
 import Breakdown from './Breakdown';
+import InspectionGlass from './InspectionGlass';
 
 export type Status = 'pending' | 'approved' | 'refused';
 @Entity('inspections')
@@ -186,6 +187,15 @@ export default class Inspection {
     cascade: true,
   })
   breakdowns: Breakdown[];
+
+  @OneToMany(
+    () => InspectionGlass,
+    inspectionGlass => inspectionGlass.inspection,
+    {
+      cascade: true,
+    },
+  )
+  glass: InspectionGlass[];
 
   @CreateDateColumn()
   created_at: Date;
