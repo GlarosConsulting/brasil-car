@@ -44,7 +44,7 @@ class InspectionsRepository implements IInspectionsRepository {
         ...(status && { status }),
         ...{ isDetailed },
       },
-      relations: ['breakdowns'],
+      relations: ['breakdowns', 'glass'],
     });
 
     return inspections;

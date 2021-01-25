@@ -258,7 +258,7 @@ class CreateInspectionService {
         this.createInspectionGlassService.execute({
           img_filename: rightInspectionGlass,
           inspection_id: inspection.id,
-          name: 'lateral direita',
+          name: 'vidro da lateral direita',
         }),
       );
 
@@ -270,7 +270,7 @@ class CreateInspectionService {
         this.createInspectionGlassService.execute({
           img_filename: leftInspectionGlass,
           inspection_id: inspection.id,
-          name: 'lateral esquerda',
+          name: 'vidoro da lateral esquerda',
         }),
       );
 
@@ -282,7 +282,7 @@ class CreateInspectionService {
         this.createInspectionGlassService.execute({
           img_filename: forwardInspectionGlass,
           inspection_id: inspection.id,
-          name: 'dianteira',
+          name: 'vidoro da dianteira',
         }),
       );
 
@@ -294,7 +294,7 @@ class CreateInspectionService {
         this.createInspectionGlassService.execute({
           img_filename: rearInspectionGlass,
           inspection_id: inspection.id,
-          name: 'traseira',
+          name: 'vidoro da traseira',
         }),
       );
 

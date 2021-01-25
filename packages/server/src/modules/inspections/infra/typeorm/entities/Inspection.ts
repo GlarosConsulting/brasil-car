@@ -186,6 +186,7 @@ export default class Inspection {
   @OneToMany(() => Breakdown, breakdown => breakdown.inspection, {
     cascade: true,
   })
+  @Exclude()
   breakdowns: Breakdown[];
 
   @OneToMany(
@@ -195,6 +196,7 @@ export default class Inspection {
       cascade: true,
     },
   )
+  @Exclude()
   glass: InspectionGlass[];
 
   @CreateDateColumn()
@@ -272,6 +274,8 @@ export default class Inspection {
       ),
       rear_right_buffer_img_url: formatFileToUrl(this.rear_right_buffer_img),
       rear_left_buffer_img_url: formatFileToUrl(this.rear_left_buffer_img),
+      breakdowns: this.breakdowns,
+      glass: this.glass,
     };
   }
 }
