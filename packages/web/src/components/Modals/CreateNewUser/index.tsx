@@ -17,6 +17,7 @@ import { Form } from '@unform/web';
 import * as Yup from 'yup';
 
 import Input from '@/components/Input';
+import SocialButton from '@/components/SocialButton';
 import { useAuthentication } from '@/context/authentication';
 import getValidationErrors from '@/utils/getValidationErrors';
 
@@ -41,7 +42,7 @@ const CrateNewUserModal: React.FC<ICrateNewUserModalProps> = ({
 }) => {
   const formRef = useRef<FormHandles>(null);
 
-  const { createUser } = useAuthentication();
+  const { createUser, signInWithPopup } = useAuthentication();
   const toast = useToast();
 
   const handleSubmit = useCallback(async (data: IFormData, event) => {
@@ -112,14 +113,14 @@ const CrateNewUserModal: React.FC<ICrateNewUserModalProps> = ({
 
           <Form ref={formRef} onSubmit={handleSubmit}>
             <ModalBody paddingBottom={4}>
-              <Flex>
+              <Flex direction="column">
                 <Input
                   name="email"
                   placeholder="E-mail"
                   containerProps={{
                     border: '1px solid',
                     borderColor: 'gray.400',
-                    marginRight: 2,
+                    marginBottom: 2,
                     bg: 'white',
                   }}
                 />
@@ -131,7 +132,7 @@ const CrateNewUserModal: React.FC<ICrateNewUserModalProps> = ({
                   containerProps={{
                     border: '1px solid',
                     borderColor: 'gray.400',
-                    marginRight: 2,
+                    marginBottom: 2,
                     bg: 'white',
                   }}
                 />
@@ -150,6 +151,16 @@ const CrateNewUserModal: React.FC<ICrateNewUserModalProps> = ({
             </ModalBody>
 
             <ModalFooter>
+              <SocialButton
+                width={64}
+                marginRight={4}
+                btnType="google"
+                color="#de4d41"
+                backgroundColor="#f5e7ea"
+                onClick={() => signInWithPopup('google')}
+              >
+                Entrar com o Google
+              </SocialButton>
               <Button variant="ghost" onClick={onClose} marginRight={4}>
                 Cancelar
               </Button>
