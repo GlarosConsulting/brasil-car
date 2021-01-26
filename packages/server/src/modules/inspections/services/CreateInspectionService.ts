@@ -112,7 +112,7 @@ class CreateInspectionService {
     @inject('InspectionsBreakdownsRepository')
     private inspectionsBreakdownsRepository: IInspectionsBreakdownsRepository,
 
-    @inject('InspectionGlassRepository')
+    @inject('InspectionsGlassRepository')
     private inspectionsGlassRepository: IInspectionsGlassRepository,
 
     @inject('StorageProvider')
