@@ -137,6 +137,9 @@ const DetailedInspection: React.FC = () => {
 
       formRef.current?.reset();
 
+      setBreakdownsPhotoUri([]);
+      setGlassPhotoUri([]);
+
       Alert.alert(
         'Enviado com sucesso',
         'Todas as fotos foram enviadas com sucesso!',
