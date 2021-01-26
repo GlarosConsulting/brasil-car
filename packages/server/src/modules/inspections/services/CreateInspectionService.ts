@@ -12,7 +12,7 @@ import CreateInspectionGlassService from '@modules/inspections/services/CreateIn
 
 interface IRequest {
   user_id: string;
-  isDetailed: boolean;
+  is_detailed: boolean;
   filenames: {
     forward?: string;
     croup?: string;
@@ -137,7 +137,7 @@ class CreateInspectionService {
     left_glass,
     forward_glass,
     rear_glass,
-    isDetailed,
+    is_detailed,
   }: IRequest): Promise<Inspection> {
     const allFilenames: Array<keyof typeof filenames> = [
       'forward',
@@ -199,7 +199,7 @@ class CreateInspectionService {
 
     const inspection = await this.inspectionsRepository.create({
       user_id,
-      isDetailed,
+      is_detailed,
       limit_date: limitDate,
       forward_img: sentFilenames?.forward,
       croup_img: sentFilenames?.croup,

@@ -22,7 +22,7 @@ class InspectionsRepository implements IInspectionsRepository {
     start_date,
     end_date,
     status,
-    isDetailed,
+    is_detailed,
   }: IFindAllInspectionsDTO): Promise<Inspection[]> {
     let dateCriteria;
 
@@ -42,7 +42,7 @@ class InspectionsRepository implements IInspectionsRepository {
       where: {
         ...(dateCriteria && { created_at: dateCriteria }),
         ...(status && { status }),
-        ...{ isDetailed },
+        ...{ is_detailed },
       },
       relations: ['breakdowns', 'glass'],
     });

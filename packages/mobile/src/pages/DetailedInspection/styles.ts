@@ -5,3 +5,14 @@ export const Cards = styled.ScrollView`
 
   padding: 20px 16px 8px;
 `;
+
+export const EmptyListContainer = styled.View`
+  width: 100%;
+
+  align-items: center;
+`;
+
+export const EmptyListText = styled.Text`
+  font-size: 16px;
+  color: #888;
+`;

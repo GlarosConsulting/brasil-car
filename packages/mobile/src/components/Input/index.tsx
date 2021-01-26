@@ -27,43 +27,44 @@ const Input: React.ForwardRefRenderFunction<IRefInput, IInputProps> = (
   { name, icon, ...rest },
   ref,
 ) => {
-  const InputElementRef = useRef<any>(null);
+  const inputElementRef = useRef<any>(null);
 
   const { registerField, defaultValue = '', fieldName, error } = useField(name);
-  const InputValueRef = useRef<IReferenceInputValue>({ value: defaultValue });
+
+  const inputValueRef = useRef<IReferenceInputValue>({ value: defaultValue });
 
   useImperativeHandle(ref, () => ({
     focus() {
-      InputElementRef.current.focus();
+      inputElementRef.current.focus();
     },
   }));
 
   useEffect(() => {
     registerField<string>({
       name: fieldName,
-      ref: InputValueRef.current,
+      ref: inputValueRef.current,
       path: 'value',
       setValue(_ref, value) {
-        InputValueRef.current.value = value;
-        InputElementRef.current.setNativeProps({ text: value });
+        inputValueRef.current.value = value;
+        inputElementRef.current.setNativeProps({ text: value });
       },
       clearValue() {
-        InputValueRef.current.value = '';
-        InputElementRef.current.clear();
+        inputValueRef.current.value = '';
+        inputElementRef.current.clear();
       },
     });
-  }, [fieldName, InputValueRef, registerField]);
+  }, [fieldName, inputValueRef, registerField]);
 
   return (
     <Container isErrored={!!error}>
       {icon ? <Icon name={icon} size={20} color="#666360" /> : null}
 
       <TextInput
-        ref={InputElementRef}
+        ref={inputElementRef}
         keyboardAppearance="dark"
         placeholderTextColor="#666360"
         onChangeText={(value: string) => {
-          InputValueRef.current.value = value;
+          inputValueRef.current.value = value;
         }}
         {...rest}
       />

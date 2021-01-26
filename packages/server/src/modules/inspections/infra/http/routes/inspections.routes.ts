@@ -40,7 +40,6 @@ inspectionsRouter.get(
   }),
   detailedInspectionsController.index,
 );
-
 inspectionsRouter.post(
   '/',
   upload.fields([
@@ -82,15 +81,15 @@ inspectionsRouter.post(
     { name: 'rear_right_buffer', maxCount: 1 },
     { name: 'rear_left_buffer', maxCount: 1 },
     { name: 'breakdown' },
-    { name: 'right_glass' },
-    { name: 'left_glass' },
     { name: 'forward_glass' },
     { name: 'rear_glass' },
+    { name: 'right_glass' },
+    { name: 'left_glass' },
   ]),
   celebrate({
     [Segments.BODY]: {
       user_id: Joi.string().required(),
-      isDetailed: Joi.boolean().required(),
+      is_detailed: Joi.boolean().default(false),
     },
   }),
   inspectionsController.create,

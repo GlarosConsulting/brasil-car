@@ -23,7 +23,7 @@ export default class Inspection {
   user_id: string;
 
   @Column()
-  isDetailed: boolean;
+  is_detailed: boolean;
 
   @Column({ type: 'enum' })
   status: Status;

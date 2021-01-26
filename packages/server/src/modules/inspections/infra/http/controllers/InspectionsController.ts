@@ -6,7 +6,7 @@ import CreateInspectionService from '@modules/inspections/services/CreateInspect
 
 export default class InspectionsController {
   public async create(request: Request, response: Response): Promise<Response> {
-    const { user_id, isDetailed } = request.body;
+    const { user_id, is_detailed } = request.body;
     const files = request.files as {
       [fieldName: string]: Express.Multer.File[];
     };
@@ -21,7 +21,7 @@ export default class InspectionsController {
 
     const inspection = await createInspection.execute({
       user_id,
-      isDetailed,
+      is_detailed: is_detailed === 'true',
       filenames: {
         forward: getFilename(files.forward),
         croup: getFilename(files.croup),
