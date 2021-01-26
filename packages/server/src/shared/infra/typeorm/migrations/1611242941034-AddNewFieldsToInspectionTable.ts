@@ -149,12 +149,6 @@ export class AddNewFieldsToInspectionTable1611242941034
         isNullable: true,
       }),
       new TableColumn({
-        name: 'chassis_img',
-        type: 'varchar',
-        isUnique: true,
-        isNullable: true,
-      }),
-      new TableColumn({
         name: 'engine_number_img',
         type: 'varchar',
         isUnique: true,
@@ -359,12 +353,6 @@ export class AddNewFieldsToInspectionTable1611242941034
       }),
       new TableColumn({
         name: 'console_img',
-        type: 'varchar',
-        isUnique: true,
-        isNullable: true,
-      }),
-      new TableColumn({
-        name: 'chassis_img',
         type: 'varchar',
         isUnique: true,
         isNullable: true,

@@ -3,17 +3,19 @@ import { getRepository, Repository } from 'typeorm';
 import ICreateBreakdownsDTO from '@modules/inspections/dtos/ICreateBreakdownsDTO';
 import IInspectionsBreakdownsRepository from '@modules/inspections/repositories/IInspectionsBreakdownsRepository';
 
-import Breakdown from '../entities/Breakdown';
+import InspectionBreakdown from '../entities/InspectionBreakdown';
 
 class InspectionsBreakdownsRepository
   implements IInspectionsBreakdownsRepository {
-  private ormRepository: Repository<Breakdown>;
+  private ormRepository: Repository<InspectionBreakdown>;
 
   constructor() {
-    this.ormRepository = getRepository(Breakdown);
+    this.ormRepository = getRepository(InspectionBreakdown);
   }
 
-  public async create(data: ICreateBreakdownsDTO): Promise<Breakdown> {
+  public async create(
+    data: ICreateBreakdownsDTO,
+  ): Promise<InspectionBreakdown> {
     const breakdown = this.ormRepository.create(data);
 
     await this.ormRepository.save(breakdown);
@@ -21,7 +23,9 @@ class InspectionsBreakdownsRepository
     return breakdown;
   }
 
-  public async save(breakdown: Breakdown): Promise<Breakdown> {
+  public async save(
+    breakdown: InspectionBreakdown,
+  ): Promise<InspectionBreakdown> {
     return this.ormRepository.save(breakdown);
   }
 }
