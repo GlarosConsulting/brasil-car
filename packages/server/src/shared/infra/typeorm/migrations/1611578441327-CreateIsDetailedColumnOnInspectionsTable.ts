@@ -6,7 +6,7 @@ export class CreateIsDetailedColumnOnInspectionsTable1611578441327
     await queryRunner.addColumn(
       'inspections',
       new TableColumn({
-        name: 'isDetailed',
+        name: 'is_detailed',
         type: 'boolean',
         default: false,
         isNullable: false,
@@ -15,6 +15,6 @@ export class CreateIsDetailedColumnOnInspectionsTable1611578441327
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropColumn('inspections', 'isDetailed');
+    await queryRunner.dropColumn('inspections', 'is_detailed');
   }
 }

@@ -1,199 +1,177 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Dimensions, Alert } from 'react-native';
 import { CircleSnail } from 'react-native-progress';
 
+import { FormHandles } from '@unform/core';
+import { Form } from '@unform/mobile';
+import * as Yup from 'yup';
+
+import Button from '../../components/Button';
 import Header from '../../components/Header';
 import PhotoCard from '../../components/PhotoCard';
 import { useAuth } from '../../hooks/auth';
 import api from '../../services/api';
+import getValidationErrors from '../../utils/getValidationError';
 
-import {
-  Container,
-  Cards,
-  Row,
-  SendButtonContainer,
-  SendButtonText,
-} from './styles';
+import { Cards } from './styles';
 
-const Home: React.FC = () => {
+interface IFormData {
+  forward: string;
+  croup: string;
+  left_side: string;
+  right_side: string;
+  motor: string;
+  chassi: string;
+  document: string;
+  panel: string;
+}
+
+const Inspection: React.FC = () => {
+  const formRef = useRef<FormHandles>(null);
+
   const { user } = useAuth();
-
-  const [forwardPhotoUri, setForwardPhotoUri] = useState<string | null>();
-  const [croupPhotoUri, setCroupPhotoUri] = useState<string | null>();
-  const [leftSidePhotoUri, setLeftSidePhotoUri] = useState<string | null>();
-  const [rightSidePhotoUri, setRightSidePhotoUri] = useState<string | null>();
-  const [motorPhotoUri, setMotorPhotoUri] = useState<string | null>();
-  const [chassiPhotoUri, setChassiPhotoUri] = useState<string | null>();
-  const [documentPhotoUri, setDocumentPhotoUri] = useState<string | null>();
-  const [panelPhotoUri, setPanelPhotoUri] = useState<string | null>();
 
   const [isSending, setIsSending] = useState(false);
 
-  const photoCardProps = useMemo(() => {
-    const screenWidth = Dimensions.get('screen').width;
-
-    const width = `${screenWidth * 0.44}px`;
-    const height = `${screenWidth * 0.34}px`;
-
-    return {
-      width,
-      height,
-    };
-  }, []);
-
-  const handleSend = useCallback(async () => {
-    try {
-      if (
-        !forwardPhotoUri ||
-        !croupPhotoUri ||
-        !leftSidePhotoUri ||
-        !rightSidePhotoUri ||
-        !motorPhotoUri ||
-        !chassiPhotoUri ||
-        !documentPhotoUri ||
-        !panelPhotoUri
-      ) {
-        Alert.alert(
-          'Alerta',
-          'Por favor, preencha todas as fotos antes de enviar.',
-        );
-
+  const handleSubmit = useCallback(async (data: IFormData) => {
+    const appendImageToFormData = (
+      formData: FormData,
+      key: string,
+      imageUri?: string | null,
+    ) => {
+      if (!imageUri) {
         return;
       }
 
-      const appendImageToFormData = (
-        formData: FormData,
-        key: string,
-        imageUri?: string | null,
-      ) => {
-        if (!imageUri) {
-          return;
+      formData.append(key, {
+        type: 'image/jpeg',
+        name: `${key}-${user?.uid}.jpg`,
+        uri: imageUri,
+      } as any);
+    };
+
+    try {
+      const schema = Yup.object().shape({
+        forward: Yup.string().required(),
+        croup: Yup.string().required(),
+        left_side: Yup.string().required(),
+        right_side: Yup.string().required(),
+        motor: Yup.string().required(),
+        chassi: Yup.string().required(),
+        document: Yup.string().required(),
+        panel: Yup.string().required(),
+      });
+
+      await schema.validate(data, {
+        abortEarly: false,
+      });
+      const formData = new FormData();
+
+      formData.append('user_id', user?.uid || 'not_found');
+
+      Object.keys(data).forEach(key => {
+        const value = (data as any)[key];
+
+        if (value) {
+          appendImageToFormData(formData, key, value);
         }
-
-        formData.append(key, {
-          type: 'image/jpeg',
-          name: `${key}-${user?.uid}.jpg`,
-          uri: imageUri,
-        } as any);
-      };
-
-      const data = new FormData();
-
-      data.append('user_id', user?.uid || 'not_found');
-
-      appendImageToFormData(data, 'forward', forwardPhotoUri);
-      appendImageToFormData(data, 'croup', croupPhotoUri);
-      appendImageToFormData(data, 'left_side', leftSidePhotoUri);
-      appendImageToFormData(data, 'right_side', rightSidePhotoUri);
-      appendImageToFormData(data, 'motor', motorPhotoUri);
-      appendImageToFormData(data, 'chassi', chassiPhotoUri);
-      appendImageToFormData(data, 'document', documentPhotoUri);
-      appendImageToFormData(data, 'panel', panelPhotoUri);
+      });
 
       setIsSending(true);
 
-      await api.post('/inspections', data);
+      await api.post('/inspections', formData);
 
-      setForwardPhotoUri(null);
-      setCroupPhotoUri(null);
-      setLeftSidePhotoUri(null);
-      setRightSidePhotoUri(null);
-      setMotorPhotoUri(null);
-      setChassiPhotoUri(null);
-      setDocumentPhotoUri(null);
-      setPanelPhotoUri(null);
-
-      setIsSending(false);
+      formRef.current?.reset();
 
       Alert.alert(
         'Enviado com sucesso',
         'Todas as fotos foram enviadas com sucesso!',
       );
     } catch (err) {
-      Alert.alert('Ocorreu um erro', String(err));
+      if (err instanceof Yup.ValidationError) {
+        const errors = getValidationErrors(err);
+
+        Alert.alert('Aviso', 'Por favor, verifique suas fotos.');
+
+        formRef.current?.setErrors(errors);
+
+        return;
+      }
+
+      console.log(JSON.stringify(err));
+
+      Alert.alert(
+        'Ocorreu um erro',
+        'Ocorreu um erro inesperado ao enviar as fotos, tente novamente.',
+      );
+    } finally {
+      setIsSending(false);
     }
-  }, [
-    forwardPhotoUri,
-    croupPhotoUri,
-    leftSidePhotoUri,
-    rightSidePhotoUri,
-    motorPhotoUri,
-    chassiPhotoUri,
-    documentPhotoUri,
-    panelPhotoUri,
-  ]);
+  }, []);
+
+  const photoCardProps = useMemo(() => {
+    const screenWidth = Dimensions.get('screen').width;
+
+    const width = `${screenWidth * 0.44}px`;
+    const height = '164px';
+
+    return {
+      width,
+      height,
+      style: {
+        marginBottom: 16,
+      },
+    };
+  }, []);
 
   return (
     <>
       <Header />
 
-      <Container>
-        <Cards>
-          <Row>
-            <PhotoCard
-              {...photoCardProps}
-              title="Dianteira"
-              uri={forwardPhotoUri}
-              onPhotoUriChange={setForwardPhotoUri}
-            />
-            <PhotoCard
-              {...photoCardProps}
-              title="Traseira"
-              uri={croupPhotoUri}
-              onPhotoUriChange={setCroupPhotoUri}
-            />
-          </Row>
+      <Form ref={formRef} onSubmit={handleSubmit}>
+        <Cards
+          contentContainerStyle={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            paddingBottom: 96,
+          }}
+        >
+          <PhotoCard {...photoCardProps} name="forward" title="Dianteira" />
 
-          <Row>
-            <PhotoCard
-              {...photoCardProps}
-              title="Lateral esquerda"
-              uri={leftSidePhotoUri}
-              onPhotoUriChange={setLeftSidePhotoUri}
-            />
-            <PhotoCard
-              {...photoCardProps}
-              title="Lateral direita"
-              uri={rightSidePhotoUri}
-              onPhotoUriChange={setRightSidePhotoUri}
-            />
-          </Row>
+          <PhotoCard {...photoCardProps} name="croup" title="Traseira" />
 
-          <Row>
-            <PhotoCard
-              {...photoCardProps}
-              title="Motor"
-              uri={motorPhotoUri}
-              onPhotoUriChange={setMotorPhotoUri}
-            />
-            <PhotoCard
-              {...photoCardProps}
-              title="Chassi"
-              uri={chassiPhotoUri}
-              onPhotoUriChange={setChassiPhotoUri}
-            />
-          </Row>
+          <PhotoCard
+            {...photoCardProps}
+            name="left_side"
+            title="Lateral esquerda"
+          />
 
-          <Row>
-            <PhotoCard
-              {...photoCardProps}
-              title="Documento"
-              uri={documentPhotoUri}
-              onPhotoUriChange={setDocumentPhotoUri}
-            />
-            <PhotoCard
-              {...photoCardProps}
-              title="Painel"
-              uri={panelPhotoUri}
-              onPhotoUriChange={setPanelPhotoUri}
-            />
-          </Row>
+          <PhotoCard
+            {...photoCardProps}
+            name="right_side"
+            title="Lateral direita"
+          />
+
+          <PhotoCard {...photoCardProps} name="motor" title="Motor" />
+
+          <PhotoCard {...photoCardProps} name="chassi" title="Chassi" />
+
+          <PhotoCard {...photoCardProps} name="document" title="Documento" />
+
+          <PhotoCard {...photoCardProps} name="panel" title="Painel" />
+
+          <Button
+            background="#344c66"
+            onPress={() => {
+              formRef.current?.submitForm();
+            }}
+            style={{ marginTop: 32, marginBottom: 24 }}
+          >
+            Enviar
+          </Button>
         </Cards>
-
-        <SendButtonContainer activeOpacity={0.6} onPress={handleSend}>
-          <SendButtonText>Enviar</SendButtonText>
-        </SendButtonContainer>
-      </Container>
+      </Form>
 
       {isSending && (
         <CircleSnail
@@ -211,4 +189,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default Inspection;

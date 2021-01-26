@@ -1,18 +1,34 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { Dimensions, Alert } from 'react-native';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { Dimensions, Alert, Text } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import OptionsMenu from 'react-native-option-menu';
 import { CircleSnail } from 'react-native-progress';
+
+import { FormHandles } from '@unform/core';
+import { Form } from '@unform/mobile';
+import capitalize from 'capitalize';
+import * as Yup from 'yup';
 
 import Button from '../../components/Button';
 import Header from '../../components/Header';
 import PhotoCard from '../../components/PhotoCard';
 import { useAuth } from '../../hooks/auth';
 import api from '../../services/api';
+import getCarSideTranslation from '../../utils/getCarSideTranslation';
+import getValidationErrors from '../../utils/getValidationError';
 
-import { Cards } from './styles';
+import { Cards, EmptyListContainer, EmptyListText } from './styles';
 
 interface IListPhotoUri {
   id: number;
   uri?: string;
+  data?: any;
 }
 
 interface IListActions {
@@ -20,112 +36,144 @@ interface IListActions {
   setList: React.Dispatch<React.SetStateAction<IListPhotoUri[]>>;
 }
 
-const Home: React.FC = () => {
-  const { user } = useAuth();
+interface IFormData {
+  forward_left: string;
+  forward_right: string;
+  rear_left: string;
+  rear_right: string;
+  forward_right_with_opened_hood: string;
+  forward_left_with_opened_hood: string;
+  forward_with_opened_hood: string;
+  rear_plate: string;
+  opened_trunk: string;
+  seal_plate: string;
+  spare_tire: string;
+  key: string;
+  forward_left_wheel: string;
+  forward_right_wheel: string;
+  rear_left_wheel: string;
+  rear_right_wheel: string;
+  panel: string;
+  left_column: string;
+  right_column: string;
+  pedometer: string;
+  forward_left_tire: string;
+  forward_right_tire: string;
+  rear_left_tire: string;
+  rear_right_tire: string;
+  console: string;
+  chassi: string;
+  engine_number: string;
+  document: string;
+  forward_left_buffer: string;
+  forward_right_buffer: string;
+  rear_left_buffer: string;
+  rear_right_buffer: string;
+}
 
-  const [forwardPhotoUri, setForwardPhotoUri] = useState<string | null>();
-  const [croupPhotoUri, setCroupPhotoUri] = useState<string | null>();
-  const [leftSidePhotoUri, setLeftSidePhotoUri] = useState<string | null>();
-  const [rightSidePhotoUri, setRightSidePhotoUri] = useState<string | null>();
-  const [motorPhotoUri, setMotorPhotoUri] = useState<string | null>();
-  const [chassiPhotoUri, setChassiPhotoUri] = useState<string | null>();
-  const [documentPhotoUri, setDocumentPhotoUri] = useState<string | null>();
-  const [panelPhotoUri, setPanelPhotoUri] = useState<string | null>();
+const DetailedInspection: React.FC = () => {
+  const formRef = useRef<FormHandles>(null);
+
+  const { user } = useAuth();
 
   const [breakdownsPhotoUri, setBreakdownsPhotoUri] = useState<IListPhotoUri[]>(
     [],
   );
-  const [glassesPhotoUri, setGlassesPhotoUri] = useState<IListPhotoUri[]>([]);
+  const [glassPhotoUri, setGlassPhotoUri] = useState<IListPhotoUri[]>([]);
 
   const [isSending, setIsSending] = useState(false);
 
-  const handleSend = useCallback(async () => {
-    try {
-      if (
-        !forwardPhotoUri ||
-        !croupPhotoUri ||
-        !leftSidePhotoUri ||
-        !rightSidePhotoUri ||
-        !motorPhotoUri ||
-        !chassiPhotoUri ||
-        !documentPhotoUri ||
-        !panelPhotoUri
-      ) {
-        Alert.alert(
-          'Alerta',
-          'Por favor, preencha todas as fotos antes de enviar.',
-        );
-
+  const handleSubmit = useCallback(async (data: IFormData) => {
+    const appendImageToFormData = (
+      formData: FormData,
+      key: string,
+      imageUri?: string | null,
+    ) => {
+      if (!imageUri) {
         return;
       }
 
-      const appendImageToFormData = (
-        formData: FormData,
-        key: string,
-        imageUri?: string | null,
-      ) => {
-        if (!imageUri) {
-          return;
+      formData.append(key, {
+        type: 'image/jpeg',
+        name: `${key}-${user?.uid}.jpg`,
+        uri: imageUri,
+      } as any);
+    };
+
+    try {
+      const schema = Yup.object().shape({
+        forward_left: Yup.string().required(),
+        forward_right: Yup.string().required(),
+      });
+
+      await schema.validate(data, {
+        abortEarly: false,
+      });
+
+      const formData = new FormData();
+
+      formData.append('user_id', user?.uid || 'not_found');
+      formData.append('is_detailed', 'true');
+
+      Object.keys(data).forEach(key => {
+        const value = (data as any)[key];
+
+        if (value) {
+          appendImageToFormData(formData, key, value);
         }
+      });
 
-        formData.append(key, {
-          type: 'image/jpeg',
-          name: `${key}-${user?.uid}.jpg`,
-          uri: imageUri,
-        } as any);
-      };
+      breakdownsPhotoUri.forEach(breakdown =>
+        appendImageToFormData(formData, 'breakdown', breakdown.uri),
+      );
 
-      const data = new FormData();
-
-      data.append('user_id', user?.uid || 'not_found');
-
-      appendImageToFormData(data, 'forward', forwardPhotoUri);
-      appendImageToFormData(data, 'croup', croupPhotoUri);
-      appendImageToFormData(data, 'left_side', leftSidePhotoUri);
-      appendImageToFormData(data, 'right_side', rightSidePhotoUri);
-      appendImageToFormData(data, 'motor', motorPhotoUri);
-      appendImageToFormData(data, 'chassi', chassiPhotoUri);
-      appendImageToFormData(data, 'document', documentPhotoUri);
-      appendImageToFormData(data, 'panel', panelPhotoUri);
+      glassPhotoUri.forEach(
+        glass =>
+          glass.data?.side &&
+          appendImageToFormData(
+            formData,
+            `${glass.data.side}_glass`,
+            glass.uri,
+          ),
+      );
 
       setIsSending(true);
 
-      await api.post('/inspections', data);
+      await api.post('/inspections', formData);
 
-      setForwardPhotoUri(null);
-      setCroupPhotoUri(null);
-      setLeftSidePhotoUri(null);
-      setRightSidePhotoUri(null);
-      setMotorPhotoUri(null);
-      setChassiPhotoUri(null);
-      setDocumentPhotoUri(null);
-      setPanelPhotoUri(null);
-
-      setIsSending(false);
+      formRef.current?.reset();
 
       Alert.alert(
         'Enviado com sucesso',
         'Todas as fotos foram enviadas com sucesso!',
       );
     } catch (err) {
-      Alert.alert('Ocorreu um erro', String(err));
+      if (err instanceof Yup.ValidationError) {
+        const errors = getValidationErrors(err);
+
+        Alert.alert('Aviso', 'Por favor, verifique suas fotos.');
+
+        formRef.current?.setErrors(errors);
+
+        return;
+      }
+
+      console.log(JSON.stringify(err));
+
+      Alert.alert(
+        'Ocorreu um erro',
+        'Ocorreu um erro inesperado ao enviar as fotos, tente novamente.',
+      );
+    } finally {
+      setIsSending(false);
     }
-  }, [
-    forwardPhotoUri,
-    croupPhotoUri,
-    leftSidePhotoUri,
-    rightSidePhotoUri,
-    motorPhotoUri,
-    chassiPhotoUri,
-    documentPhotoUri,
-    panelPhotoUri,
-  ]);
+  }, []);
 
   const handleAddItemToListPhotoUri = useCallback(
-    ({ list, setList }: IListActions) => {
+    ({ list, setList }: IListActions, data?: any) => {
       const id = list.length + 1;
 
-      setList([...list, { id, uri: undefined }]);
+      setList([...list, { id, uri: undefined, data }]);
     },
     [breakdownsPhotoUri],
   );
@@ -156,171 +204,398 @@ const Home: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    formRef.current?.setData({
+      forward_left:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      forward_right:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      rear_left:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      rear_right:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      forward_right_with_opened_hood:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      forward_left_with_opened_hood:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      forward_with_opened_hood:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      rear_plate:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      opened_trunk:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      seal_plate:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      spare_tire:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      key:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      forward_left_wheel:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      forward_right_wheel:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      rear_left_wheel:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      rear_right_wheel:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      panel:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      left_column:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      right_column:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      pedometer:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      forward_left_tire:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      forward_right_tire:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      rear_left_tire:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      rear_right_tire:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      console:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      chassi:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      engine_number:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      document:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      forward_left_buffer:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      forward_right_buffer:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      rear_left_buffer:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+      rear_right_buffer:
+        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+    });
+  }, [formRef]);
+
   return (
     <>
       <Header />
 
-      <Cards
-        contentContainerStyle={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          paddingBottom: 32,
-        }}
-      >
-        <PhotoCard
-          {...photoCardProps}
-          title="Dianteira"
-          uri={forwardPhotoUri}
-          onPhotoUriChange={setForwardPhotoUri}
-        />
-
-        <PhotoCard
-          {...photoCardProps}
-          title="Traseira"
-          uri={croupPhotoUri}
-          onPhotoUriChange={setCroupPhotoUri}
-        />
-
-        <PhotoCard
-          {...photoCardProps}
-          title="Lateral esquerda"
-          uri={leftSidePhotoUri}
-          onPhotoUriChange={setLeftSidePhotoUri}
-        />
-
-        <PhotoCard
-          {...photoCardProps}
-          title="Lateral direita"
-          uri={rightSidePhotoUri}
-          onPhotoUriChange={setRightSidePhotoUri}
-        />
-
-        <PhotoCard
-          {...photoCardProps}
-          title="Motor"
-          uri={motorPhotoUri}
-          onPhotoUriChange={setMotorPhotoUri}
-        />
-
-        <PhotoCard
-          {...photoCardProps}
-          title="Chassi"
-          uri={chassiPhotoUri}
-          onPhotoUriChange={setChassiPhotoUri}
-        />
-
-        <PhotoCard
-          {...photoCardProps}
-          title="Documento"
-          uri={documentPhotoUri}
-          onPhotoUriChange={setDocumentPhotoUri}
-        />
-
-        <PhotoCard
-          {...photoCardProps}
-          title="Painel"
-          uri={panelPhotoUri}
-          onPhotoUriChange={setPanelPhotoUri}
-        />
-
-        <PhotoCard
-          {...photoCardProps}
-          title="Painel"
-          uri={panelPhotoUri}
-          onPhotoUriChange={setPanelPhotoUri}
-        />
-
-        <PhotoCard
-          {...photoCardProps}
-          title="Painel"
-          uri={panelPhotoUri}
-          onPhotoUriChange={setPanelPhotoUri}
-        />
-
-        <PhotoCard
-          {...photoCardProps}
-          title="Painel"
-          uri={panelPhotoUri}
-          onPhotoUriChange={setPanelPhotoUri}
-        />
-
-        <PhotoCard
-          {...photoCardProps}
-          title="Painel"
-          uri={panelPhotoUri}
-          onPhotoUriChange={setPanelPhotoUri}
-        />
-
-        <PhotoCard
-          {...photoCardProps}
-          title="Painel"
-          uri={panelPhotoUri}
-          onPhotoUriChange={setPanelPhotoUri}
-        />
-
-        <Button
-          onPress={() =>
-            handleAddItemToListPhotoUri({
-              list: glassesPhotoUri,
-              setList: setGlassesPhotoUri,
-            })
-          }
-          style={{ marginTop: 24, marginBottom: 24 }}
+      <Form ref={formRef} onSubmit={handleSubmit}>
+        <Cards
+          contentContainerStyle={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            paddingBottom: 88,
+          }}
         >
-          Adicionar vidro
-        </Button>
-
-        {glassesPhotoUri.map(glass => (
           <PhotoCard
-            key={glass.id}
             {...photoCardProps}
-            title={`Vidro ${glass.id}`}
-            uri={glass.uri}
-            onPhotoUriChange={uri =>
-              handleChangeListPhotoUri(glass.id, uri, {
-                list: glassesPhotoUri,
-                setList: setGlassesPhotoUri,
-              })
-            }
+            name="forward_left"
+            title="Frente do veiculo lado esquerdo"
           />
-        ))}
 
-        <Button
-          onPress={() =>
-            handleAddItemToListPhotoUri({
-              list: breakdownsPhotoUri,
-              setList: setBreakdownsPhotoUri,
-            })
-          }
-          style={{ marginTop: 24, marginBottom: 24 }}
-        >
-          Adicionar avaria
-        </Button>
-
-        {breakdownsPhotoUri.map(breakdown => (
           <PhotoCard
-            key={breakdown.id}
             {...photoCardProps}
-            title={`Avaria ${breakdown.id}`}
-            uri={breakdown.uri}
-            onPhotoUriChange={uri =>
-              handleChangeListPhotoUri(breakdown.id, uri, {
+            name="forward_right"
+            title="Frente do veiculo lado direito"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="rear_left"
+            title="Traseira do veiculo lado esquerdo"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="rear_right"
+            title="Traseira do veiculo lado direito"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="forward_right_with_opened_hood"
+            title="Frente do veiculo lado direito com capô aberto lado direito"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="forward_left_with_opened_hood"
+            title="Frente do veiculo lado direito com capô aberto lado esquerdo"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="forward_with_opened_hood"
+            title="Frente do veiculo copô aberto"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="rear_plate"
+            title="Placa traseira"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="opened_trunk"
+            title="Porta mala aberto"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="seal_plate"
+            title="Selo da placa"
+          />
+
+          <PhotoCard {...photoCardProps} name="spare_tire" title="Estepe" />
+
+          <PhotoCard {...photoCardProps} name="key" title="Chave do veiculo" />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="forward_left_wheel"
+            title="Roda dianteira esquerda"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="forward_right_wheel"
+            title="Roda dianteira direita"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="rear_left_wheel"
+            title="Roda traseira esquerda"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="rear_right_wheel"
+            title="Roda traseira direita"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="panel"
+            title="Painel do veiculo ligado"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="left_column"
+            title="Coluna esquerda"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="right_column"
+            title="Coluna direita"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="pedometer"
+            title="Hodômetro ligado"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="forward_left_tire"
+            title="Pneu dianteiro esquerdo"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="forward_right_tire"
+            title="Pneu dianteiro direito"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="rear_left_tire"
+            title="Pneu traseiro esquerdo"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="rear_right_tire"
+            title="Pneu traseiro direito"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="console"
+            title="Console (se o carro tiver)"
+          />
+
+          <PhotoCard {...photoCardProps} name="chassi" title="Chassi" />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="engine_number"
+            title="Nº do motor (caso consiga identificar)"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="document"
+            title="Fotos dos documentos de porte obrigatório do veiculo e do associado"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="forward_left_buffer"
+            title="Amortecedor dianteiro esquerdo"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="forward_right_buffer"
+            title="Amortecedor dianteiro direito"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="rear_left_buffer"
+            title="Amortecedor traseiro esquerdo"
+          />
+
+          <PhotoCard
+            {...photoCardProps}
+            name="rear_right_buffer"
+            title="Amortecedor traseiro direito"
+          />
+
+          <OptionsMenu
+            customButton={
+              <TouchableOpacity
+                style={{
+                  backgroundColor: '#312e38',
+                  width: Dimensions.get('screen').width - 32,
+                  height: 60,
+                  borderRadius: 8,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: 24,
+                  marginBottom: 24,
+                }}
+              >
+                <Text style={{ color: '#fff', fontSize: 18 }}>
+                  Adicionar vidro
+                </Text>
+              </TouchableOpacity>
+            }
+            destructiveIndex={3}
+            options={[
+              'Dianteira',
+              'Traseira',
+              'Lateral esquerda',
+              'Lateral direita',
+              'Cancelar',
+            ]}
+            actions={[
+              () =>
+                handleAddItemToListPhotoUri(
+                  {
+                    list: glassPhotoUri,
+                    setList: setGlassPhotoUri,
+                  },
+                  { side: 'forward' },
+                ),
+              () =>
+                handleAddItemToListPhotoUri(
+                  {
+                    list: glassPhotoUri,
+                    setList: setGlassPhotoUri,
+                  },
+                  { side: 'rear' },
+                ),
+              () =>
+                handleAddItemToListPhotoUri(
+                  {
+                    list: glassPhotoUri,
+                    setList: setGlassPhotoUri,
+                  },
+                  { side: 'left' },
+                ),
+              () =>
+                handleAddItemToListPhotoUri(
+                  {
+                    list: glassPhotoUri,
+                    setList: setGlassPhotoUri,
+                  },
+                  { side: 'right' },
+                ),
+            ]}
+          />
+
+          {glassPhotoUri.length > 0 ? (
+            glassPhotoUri.map((glass, index) => (
+              <PhotoCard
+                key={glass.id}
+                {...photoCardProps}
+                title={`Vidro ${index + 1} (${
+                  capitalize(getCarSideTranslation(glass.data.side)) || '-'
+                })`}
+                uri={glass.uri}
+                onPhotoUriChange={uri =>
+                  handleChangeListPhotoUri(glass.id, uri, {
+                    list: glassPhotoUri,
+                    setList: setGlassPhotoUri,
+                  })
+                }
+              />
+            ))
+          ) : (
+            <EmptyListContainer>
+              <EmptyListText>Nenhum vidro adicionado</EmptyListText>
+            </EmptyListContainer>
+          )}
+
+          <Button
+            onPress={() =>
+              handleAddItemToListPhotoUri({
                 list: breakdownsPhotoUri,
                 setList: setBreakdownsPhotoUri,
               })
             }
-          />
-        ))}
+            style={{ marginTop: 32, marginBottom: 24 }}
+          >
+            Adicionar avaria
+          </Button>
 
-        <Button
-          onPress={handleSend}
-          background="#344c66"
-          style={{ marginTop: 24, marginBottom: 24 }}
-        >
-          Enviar
-        </Button>
-      </Cards>
+          {breakdownsPhotoUri.length > 0 ? (
+            breakdownsPhotoUri.map((breakdown, index) => (
+              <PhotoCard
+                key={breakdown.id}
+                {...photoCardProps}
+                title={`Avaria ${index + 1}`}
+                uri={breakdown.uri}
+                onPhotoUriChange={uri =>
+                  handleChangeListPhotoUri(breakdown.id, uri, {
+                    list: breakdownsPhotoUri,
+                    setList: setBreakdownsPhotoUri,
+                  })
+                }
+              />
+            ))
+          ) : (
+            <EmptyListContainer>
+              <EmptyListText>Nenhuma avaria adicionada</EmptyListText>
+            </EmptyListContainer>
+          )}
+
+          <Button
+            background="#344c66"
+            onPress={() => {
+              formRef.current?.submitForm();
+            }}
+            style={{ marginTop: 32, marginBottom: 24 }}
+          >
+            Enviar
+          </Button>
+        </Cards>
+      </Form>
 
       {isSending && (
         <CircleSnail
@@ -338,4 +613,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default DetailedInspection;

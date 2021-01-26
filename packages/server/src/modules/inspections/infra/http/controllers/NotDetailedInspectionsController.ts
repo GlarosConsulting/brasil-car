@@ -16,7 +16,7 @@ export default class NotDetailedInspectionsController {
       start_date,
       end_date,
       status,
-      isDetailed: false,
+      is_detailed: false,
     } as any);
 
     return response.json(classToClass(inspections));

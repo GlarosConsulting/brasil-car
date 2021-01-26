@@ -14,7 +14,7 @@ export default class DetailedInspectionsController {
       start_date,
       end_date,
       status,
-      isDetailed: true,
+      is_detailed: true,
     } as any);
 
     return response.json(classToClass(inspections));
