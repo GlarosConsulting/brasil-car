@@ -4,8 +4,8 @@ import { injectable, inject } from 'tsyringe';
 import IStorageProvider from '@shared/container/providers/StorageProvider/models/IStorageProvider';
 
 import Inspection from '@modules/inspections/infra/typeorm/entities/Inspection';
-import IBreakdownsRepository from '@modules/inspections/repositories/IBreakdownsRepository';
-import IInspectionGlassRepository from '@modules/inspections/repositories/IInspectionGlassRepository';
+import IInspectionsBreakdownsRepository from '@modules/inspections/repositories/IInspectionsBreakdownsRepository';
+import IInspectionsGlassRepository from '@modules/inspections/repositories/IInspectionsGlassRepository';
 import IInspectionsRepository from '@modules/inspections/repositories/IInspectionsRepository';
 import CreateBreakdownsService from '@modules/inspections/services/CreateBreakdownsService';
 import CreateInspectionGlassService from '@modules/inspections/services/CreateInspectionGlassService';
@@ -109,22 +109,22 @@ class CreateInspectionService {
     @inject('InspectionsRepository')
     private inspectionsRepository: IInspectionsRepository,
 
-    @inject('BreakdownsRepository')
-    private breakdownsRepository: IBreakdownsRepository,
+    @inject('InspectionsBreakdownsRepository')
+    private inspectionsBreakdownsRepository: IInspectionsBreakdownsRepository,
 
     @inject('InspectionGlassRepository')
-    private inspectionGlassRepository: IInspectionGlassRepository,
+    private inspectionsGlassRepository: IInspectionsGlassRepository,
 
     @inject('StorageProvider')
     private storageProvider: IStorageProvider,
   ) {
     this.createBreakdownService = new CreateBreakdownsService(
-      breakdownsRepository,
+      inspectionsBreakdownsRepository,
       storageProvider,
     );
 
     this.createInspectionGlassService = new CreateInspectionGlassService(
-      inspectionGlassRepository,
+      inspectionsGlassRepository,
       storageProvider,
     );
   }

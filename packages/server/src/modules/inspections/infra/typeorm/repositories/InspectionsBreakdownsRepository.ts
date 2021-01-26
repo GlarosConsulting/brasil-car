@@ -1,11 +1,12 @@
 import { getRepository, Repository } from 'typeorm';
 
 import ICreateBreakdownsDTO from '@modules/inspections/dtos/ICreateBreakdownsDTO';
-import IBreakdownsRepository from '@modules/inspections/repositories/IBreakdownsRepository';
+import IInspectionsBreakdownsRepository from '@modules/inspections/repositories/IInspectionsBreakdownsRepository';
 
 import Breakdown from '../entities/Breakdown';
 
-class BreakdownsRepository implements IBreakdownsRepository {
+class InspectionsBreakdownsRepository
+  implements IInspectionsBreakdownsRepository {
   private ormRepository: Repository<Breakdown>;
 
   constructor() {
@@ -25,4 +26,4 @@ class BreakdownsRepository implements IBreakdownsRepository {
   }
 }
 
-export default BreakdownsRepository;
+export default InspectionsBreakdownsRepository;

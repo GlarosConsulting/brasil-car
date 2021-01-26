@@ -4,11 +4,11 @@ import './providers';
 
 import CashHandlingRepository from '@modules/cash_handling/infra/typeorm/repositories/CashHandlingRepository';
 import ICashHandlingRepository from '@modules/cash_handling/repositories/ICashHandlingRepository';
-import BreakdownsRepository from '@modules/inspections/infra/typeorm/repositories/BreakdownsRepository';
-import InspectionGlassRepository from '@modules/inspections/infra/typeorm/repositories/InspectionGlassRepository';
+import InspectionsBreakdownsRepository from '@modules/inspections/infra/typeorm/repositories/InspectionsBreakdownsRepository';
+import InspectionsGlassRepository from '@modules/inspections/infra/typeorm/repositories/InspectionsGlassRepository';
 import InspectionsRepository from '@modules/inspections/infra/typeorm/repositories/InspectionsRepository';
-import IBreakdownsRepository from '@modules/inspections/repositories/IBreakdownsRepository';
-import IInspectionGlassRepository from '@modules/inspections/repositories/IInspectionGlassRepository';
+import IInspectionsBreakdownsRepository from '@modules/inspections/repositories/IInspectionsBreakdownsRepository';
+import IInspectionsGlassRepository from '@modules/inspections/repositories/IInspectionsGlassRepository';
 import IInspectionsRepository from '@modules/inspections/repositories/IInspectionsRepository';
 import ReturnFilesRepository from '@modules/return_files/infra/typeorm/repositories/ReturnFilesRepository';
 import IReturnFilesRepository from '@modules/return_files/repositories/IReturnFilesRepository';
@@ -16,6 +16,16 @@ import IReturnFilesRepository from '@modules/return_files/repositories/IReturnFi
 container.registerSingleton<IInspectionsRepository>(
   'InspectionsRepository',
   InspectionsRepository,
+);
+
+container.registerSingleton<IInspectionsBreakdownsRepository>(
+  'InspectionsBreakdownsRepository',
+  InspectionsBreakdownsRepository,
+);
+
+container.registerSingleton<IInspectionsGlassRepository>(
+  'InspectionsGlassRepository',
+  InspectionsGlassRepository,
 );
 
 container.registerSingleton<ICashHandlingRepository>(
@@ -26,14 +36,4 @@ container.registerSingleton<ICashHandlingRepository>(
 container.registerSingleton<IReturnFilesRepository>(
   'ReturnFilesRepository',
   ReturnFilesRepository,
-);
-
-container.registerSingleton<IBreakdownsRepository>(
-  'BreakdownsRepository',
-  BreakdownsRepository,
-);
-
-container.registerSingleton<IInspectionGlassRepository>(
-  'InspectionGlassRepository',
-  InspectionGlassRepository,
 );

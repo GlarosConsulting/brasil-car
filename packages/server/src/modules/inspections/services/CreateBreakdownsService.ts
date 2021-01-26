@@ -2,7 +2,7 @@ import { injectable, inject } from 'tsyringe';
 
 import IStorageProvider from '@shared/container/providers/StorageProvider/models/IStorageProvider';
 
-import IBreakdownsRepository from '@modules/inspections/repositories/IBreakdownsRepository';
+import IInspectionsBreakdownsRepository from '@modules/inspections/repositories/IInspectionsBreakdownsRepository';
 
 import Breakdown from '../infra/typeorm/entities/Breakdown';
 
@@ -14,8 +14,8 @@ interface IRequest {
 @injectable()
 class CreateBreakdownsService {
   constructor(
-    @inject('BreakdownsRepository')
-    private breakdownsRepository: IBreakdownsRepository,
+    @inject('InspectionsBreakdownsRepository')
+    private inspectionsBreakdownsRepository: IInspectionsBreakdownsRepository,
 
     @inject('StorageProvider')
     private storageProvider: IStorageProvider,
@@ -27,7 +27,7 @@ class CreateBreakdownsService {
   }: IRequest): Promise<Breakdown> {
     const filename = await this.storageProvider.saveFile(img_filename);
 
-    const breakdown = await this.breakdownsRepository.create({
+    const breakdown = await this.inspectionsBreakdownsRepository.create({
       inspection_id,
       img_filename: filename,
     });

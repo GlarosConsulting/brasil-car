@@ -1,11 +1,11 @@
 import { getRepository, Repository } from 'typeorm';
 
 import ICreateInspectionGlassDTO from '@modules/inspections/dtos/ICreateInspectionGlassDTO';
-import IInspectionGlassRepository from '@modules/inspections/repositories/IInspectionGlassRepository';
+import IInspectionsGlassRepository from '@modules/inspections/repositories/IInspectionsGlassRepository';
 
 import InspectionGlass from '../entities/InspectionGlass';
 
-class InspectionGlasRepository implements IInspectionGlassRepository {
+class InspectionsGlassRepository implements IInspectionsGlassRepository {
   private ormRepository: Repository<InspectionGlass>;
 
   constructor() {
@@ -29,4 +29,4 @@ class InspectionGlasRepository implements IInspectionGlassRepository {
   }
 }
 
-export default InspectionGlasRepository;
+export default InspectionsGlassRepository;
