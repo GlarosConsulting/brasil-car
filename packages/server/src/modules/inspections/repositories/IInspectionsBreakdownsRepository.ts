@@ -1,7 +1,7 @@
 import ICreateBreakdownsDTO from '../dtos/ICreateBreakdownsDTO';
-import Breakdown from '../infra/typeorm/entities/Breakdown';
+import InspectionBreakdown from '../infra/typeorm/entities/InspectionBreakdown';
 
 export default interface IInspectionsBreakdownsRepository {
-  create(data: ICreateBreakdownsDTO): Promise<Breakdown>;
-  save(breakdown: ICreateBreakdownsDTO): Promise<Breakdown>;
+  create(data: ICreateBreakdownsDTO): Promise<InspectionBreakdown>;
+  save(breakdown: ICreateBreakdownsDTO): Promise<InspectionBreakdown>;
 }

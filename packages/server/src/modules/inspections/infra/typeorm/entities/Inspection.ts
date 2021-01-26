@@ -10,7 +10,7 @@ import {
 
 import formatFileToUrl from '@shared/utils/formatFileToUrl';
 
-import Breakdown from './Breakdown';
+import InspectionBreakdown from './InspectionBreakdown';
 import InspectionGlass from './InspectionGlass';
 
 export type Status = 'pending' | 'approved' | 'refused';
@@ -161,10 +161,6 @@ export default class Inspection {
 
   @Column()
   @Exclude()
-  chassis_img: string;
-
-  @Column()
-  @Exclude()
   engine_number_img: string;
 
   @Column()
@@ -183,11 +179,11 @@ export default class Inspection {
   @Exclude()
   rear_left_buffer_img: string;
 
-  @OneToMany(() => Breakdown, breakdown => breakdown.inspection, {
+  @OneToMany(() => InspectionBreakdown, breakdown => breakdown.inspection, {
     cascade: true,
   })
   @Exclude()
-  breakdowns: Breakdown[];
+  breakdowns: InspectionBreakdown[];
 
   @OneToMany(
     () => InspectionGlass,
@@ -264,7 +260,6 @@ export default class Inspection {
       rear_right_tire_img_url: formatFileToUrl(this.rear_right_tire_img),
       rear_left_tire_img_url: formatFileToUrl(this.rear_left_tire_img),
       console_img_url: formatFileToUrl(this.console_img),
-      chassis_img_url: formatFileToUrl(this.chassis_img),
       engine_number_img_url: formatFileToUrl(this.engine_number_img),
       forward_right_buffer_img_url: formatFileToUrl(
         this.forward_right_buffer_img,

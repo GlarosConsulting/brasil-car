@@ -4,7 +4,7 @@ import IStorageProvider from '@shared/container/providers/StorageProvider/models
 
 import IInspectionsBreakdownsRepository from '@modules/inspections/repositories/IInspectionsBreakdownsRepository';
 
-import Breakdown from '../infra/typeorm/entities/Breakdown';
+import InspectionBreakdown from '../infra/typeorm/entities/InspectionBreakdown';
 
 interface IRequest {
   inspection_id: string;
@@ -24,7 +24,7 @@ class CreateBreakdownsService {
   public async execute({
     inspection_id,
     img_filename,
-  }: IRequest): Promise<Breakdown> {
+  }: IRequest): Promise<InspectionBreakdown> {
     const filename = await this.storageProvider.saveFile(img_filename);
 
     const breakdown = await this.inspectionsBreakdownsRepository.create({

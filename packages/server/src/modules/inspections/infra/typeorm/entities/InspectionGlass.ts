@@ -14,7 +14,7 @@ import formatFileToUrl from '@shared/utils/formatFileToUrl';
 import Inspection from '@modules/inspections/infra/typeorm/entities/Inspection';
 
 @Entity('inspections_glass')
-export default class Breakdown {
+export default class InspectionGlass {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

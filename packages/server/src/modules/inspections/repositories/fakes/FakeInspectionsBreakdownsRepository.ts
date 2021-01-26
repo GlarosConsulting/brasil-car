@@ -2,19 +2,21 @@ import merge from 'lodash/merge';
 import { v4 } from 'uuid';
 
 import ICreateBreakdownsDTO from '@modules/inspections/dtos/ICreateBreakdownsDTO';
-import Breakdown from '@modules/inspections/infra/typeorm/entities/Breakdown';
+import InspectionBreakdown from '@modules/inspections/infra/typeorm/entities/InspectionBreakdown';
 
 import IInspectionsBreakdownsRepository from '../IInspectionsBreakdownsRepository';
 
 class FakeInspectionsBreakdownsRepository
   implements IInspectionsBreakdownsRepository {
-  private breakdowns: Breakdown[] = [];
+  private breakdowns: InspectionBreakdown[] = [];
 
-  public async create(data: ICreateBreakdownsDTO): Promise<Breakdown> {
-    const breakdown = new Breakdown();
+  public async create(
+    data: ICreateBreakdownsDTO,
+  ): Promise<InspectionBreakdown> {
+    const breakdown = new InspectionBreakdown();
 
     merge(
-      Breakdown,
+      InspectionBreakdown,
       { id: v4(), created_at: new Date(), updated_at: new Date() },
       data,
     );
@@ -24,7 +26,9 @@ class FakeInspectionsBreakdownsRepository
     return breakdown;
   }
 
-  public async save(breakdown: Breakdown): Promise<Breakdown> {
+  public async save(
+    breakdown: InspectionBreakdown,
+  ): Promise<InspectionBreakdown> {
     const findIndex = this.breakdowns.findIndex(
       findBreakdown => findBreakdown.id === breakdown.id,
     );
