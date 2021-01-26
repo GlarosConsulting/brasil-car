@@ -4,9 +4,10 @@ import { v4 } from 'uuid';
 import ICreateBreakdownsDTO from '@modules/inspections/dtos/ICreateBreakdownsDTO';
 import Breakdown from '@modules/inspections/infra/typeorm/entities/Breakdown';
 
-import IBreakdownsRepository from '../IBreakdownsRepository';
+import IInspectionsBreakdownsRepository from '../IInspectionsBreakdownsRepository';
 
-class FakeBreakdownsRepository implements IBreakdownsRepository {
+class FakeInspectionsBreakdownsRepository
+  implements IInspectionsBreakdownsRepository {
   private breakdowns: Breakdown[] = [];
 
   public async create(data: ICreateBreakdownsDTO): Promise<Breakdown> {
@@ -34,4 +35,4 @@ class FakeBreakdownsRepository implements IBreakdownsRepository {
   }
 }
 
-export default FakeBreakdownsRepository;
+export default FakeInspectionsBreakdownsRepository;

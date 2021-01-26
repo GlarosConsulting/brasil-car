@@ -4,9 +4,9 @@ import { v4 } from 'uuid';
 import ICreateInspectionGlassDTO from '@modules/inspections/dtos/ICreateInspectionGlassDTO';
 import InspectionGlass from '@modules/inspections/infra/typeorm/entities/InspectionGlass';
 
-import IInspectionGlassRepository from '../IInspectionGlassRepository';
+import IInspectionsGlassRepository from '../IInspectionsGlassRepository';
 
-class FakeInspectionGlassRepository implements IInspectionGlassRepository {
+class FakeInspectionsGlassRepository implements IInspectionsGlassRepository {
   private inspections: InspectionGlass[] = [];
 
   public async create(
@@ -36,4 +36,4 @@ class FakeInspectionGlassRepository implements IInspectionGlassRepository {
   }
 }
 
-export default FakeInspectionGlassRepository;
+export default FakeInspectionsGlassRepository;

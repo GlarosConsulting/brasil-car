@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Dimensions, Alert, Text } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import OptionsMenu from 'react-native-option-menu';
@@ -204,75 +198,6 @@ const DetailedInspection: React.FC = () => {
     };
   }, []);
 
-  useEffect(() => {
-    formRef.current?.setData({
-      forward_left:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      forward_right:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      rear_left:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      rear_right:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      forward_right_with_opened_hood:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      forward_left_with_opened_hood:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      forward_with_opened_hood:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      rear_plate:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      opened_trunk:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      seal_plate:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      spare_tire:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      key:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      forward_left_wheel:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      forward_right_wheel:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      rear_left_wheel:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      rear_right_wheel:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      panel:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      left_column:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      right_column:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      pedometer:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      forward_left_tire:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      forward_right_tire:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      rear_left_tire:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      rear_right_tire:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      console:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      chassi:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      engine_number:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      document:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      forward_left_buffer:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      forward_right_buffer:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      rear_left_buffer:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      rear_right_buffer:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-    });
-  }, [formRef]);
-
   return (
     <>
       <Header />
@@ -469,6 +394,7 @@ const DetailedInspection: React.FC = () => {
           <OptionsMenu
             customButton={
               <TouchableOpacity
+                activeOpacity={0.6}
                 style={{
                   backgroundColor: '#312e38',
                   width: Dimensions.get('screen').width - 32,

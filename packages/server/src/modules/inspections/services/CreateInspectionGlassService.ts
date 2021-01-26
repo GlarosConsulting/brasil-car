@@ -2,7 +2,7 @@ import { injectable, inject } from 'tsyringe';
 
 import IStorageProvider from '@shared/container/providers/StorageProvider/models/IStorageProvider';
 
-import IInspectionGlassRepository from '@modules/inspections/repositories/IInspectionGlassRepository';
+import IInspectionsGlassRepository from '@modules/inspections/repositories/IInspectionsGlassRepository';
 
 import InspectionGlass from '../infra/typeorm/entities/InspectionGlass';
 
@@ -15,8 +15,8 @@ interface IRequest {
 @injectable()
 class CreateInspectionGlassService {
   constructor(
-    @inject('InspectionGlassRepository')
-    private inspectionGlassRepository: IInspectionGlassRepository,
+    @inject('InspectionsGlassRepository')
+    private inspectionGlassRepository: IInspectionsGlassRepository,
 
     @inject('StorageProvider')
     private storageProvider: IStorageProvider,
