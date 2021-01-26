@@ -154,10 +154,7 @@ const DetailedInspection: React.FC = () => {
 
       console.log(JSON.stringify(err));
 
-      Alert.alert(
-        'Ocorreu um erro',
-        'Ocorreu um erro inesperado ao enviar as fotos, tente novamente.',
-      );
+      Alert.alert('Ocorreu um erro inesperado', JSON.stringify(err));
     } finally {
       setIsSending(false);
     }
