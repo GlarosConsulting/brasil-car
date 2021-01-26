@@ -21,7 +21,7 @@ export default class InspectionsController {
 
     const inspection = await createInspection.execute({
       user_id,
-      is_detailed: is_detailed === 'true',
+      is_detailed,
       filenames: {
         forward: getFilename(files.forward),
         croup: getFilename(files.croup),
