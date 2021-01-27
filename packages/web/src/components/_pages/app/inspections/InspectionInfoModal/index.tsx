@@ -48,7 +48,6 @@ const InspectionInfoModal: React.FC<IInspectionInfoModalProps> = ({
   const formRef = useRef<FormHandles>(null);
 
   const toast = useToast();
-
   const handleChangeStatus = useCallback(
     async ({ status }: IFormData) => {
       try {
@@ -84,10 +83,10 @@ const InspectionInfoModal: React.FC<IInspectionInfoModalProps> = ({
   );
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal size="full" isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
 
-      <ModalContent borderRadius="md">
+      <ModalContent paddingX={64} borderRadius="md">
         <ModalHeader>Vistoria</ModalHeader>
         <ModalCloseButton />
 
@@ -99,7 +98,7 @@ const InspectionInfoModal: React.FC<IInspectionInfoModalProps> = ({
           onSubmit={handleChangeStatus}
         >
           <ModalBody paddingBottom={4}>
-            <Stack spacing={2}>
+            <Stack width="100%" marginBottom={6} direction="row" spacing={8}>
               <Stack spacing={0}>
                 <Heading size="sm">Nome:</Heading>
                 <Text>{inspection?.name}</Text>
@@ -119,49 +118,233 @@ const InspectionInfoModal: React.FC<IInspectionInfoModalProps> = ({
                 <Heading size="sm">Situação:</Heading>
                 {inspection?.status}
               </Stack>
+            </Stack>
 
+            <Stack spacing={2}>
               <SimpleGrid columns={2} spacing={6} mt={2}>
                 <ImageCard
                   title="Dianteira"
-                  image_url={inspection?.original?.images.forward_img_url}
+                  image_url={inspection?.original?.images?.forward_img_url}
                 />
 
                 <ImageCard
                   title="Traseira"
-                  image_url={inspection?.original?.images.croup_img_url}
+                  image_url={inspection?.original?.images?.croup_img_url}
                 />
 
                 <ImageCard
                   title="Lateral esquerda"
-                  image_url={inspection?.original?.images.left_side_img_url}
+                  image_url={inspection?.original?.images?.left_side_img_url}
                 />
 
                 <ImageCard
                   title="Lateral direita"
-                  image_url={inspection?.original?.images.right_side_img_url}
+                  image_url={inspection?.original?.images?.right_side_img_url}
                 />
 
                 <ImageCard
                   title="Motor"
-                  image_url={inspection?.original?.images.motor_img_url}
+                  image_url={inspection?.original?.images?.motor_img_url}
                 />
 
                 <ImageCard
                   title="Chassi"
-                  image_url={inspection?.original?.images.chassi_img_url}
+                  image_url={inspection?.original?.images?.chassi_img_url}
                 />
 
                 <ImageCard
                   title="Documento"
-                  image_url={inspection?.original?.images.document_img_url}
+                  image_url={inspection?.original?.images?.document_img_url}
                 />
 
                 <ImageCard
                   title="Painel"
-                  image_url={inspection?.original?.images.panel_img_url}
+                  image_url={inspection?.original?.images?.panel_img_url}
                 />
 
-                {inspection?.original?.images.glass?.map(glass => (
+                <ImageCard
+                  title="Dianteira esquerda"
+                  image_url={inspection?.original?.images?.forward_left_img_url}
+                />
+
+                <ImageCard
+                  title="Dianteira direita"
+                  image_url={
+                    inspection?.original?.images?.forward_right_img_url
+                  }
+                />
+
+                <ImageCard
+                  title="Traseira esquerda"
+                  image_url={inspection?.original?.images?.rear_left_img_url}
+                />
+
+                <ImageCard
+                  title="Traseira direita"
+                  image_url={inspection?.original?.images?.rear_right_img_url}
+                />
+
+                <ImageCard
+                  title="Dianteira direita com capô aberto"
+                  image_url={
+                    inspection?.original?.images
+                      ?.forward_right_with_opened_hood_img_url
+                  }
+                />
+
+                <ImageCard
+                  title="Dianteira esquerda com capô aberto"
+                  image_url={
+                    inspection?.original?.images
+                      ?.forward_left_with_opened_hood_img_url
+                  }
+                />
+
+                <ImageCard
+                  title="Dianteira com capô aberto"
+                  image_url={
+                    inspection?.original?.images
+                      ?.forward_with_opened_hood_img_url
+                  }
+                />
+
+                <ImageCard
+                  title="Placa"
+                  image_url={inspection?.original?.images?.rear_plate_img_url}
+                />
+
+                <ImageCard
+                  title="Capô aberto"
+                  image_url={inspection?.original?.images?.opened_trunk_img_url}
+                />
+
+                <ImageCard
+                  title="Selo da placa"
+                  image_url={inspection?.original?.images?.seal_plate_img_url}
+                />
+
+                <ImageCard
+                  title="Step"
+                  image_url={inspection?.original?.images?.spare_tire_img_url}
+                />
+
+                <ImageCard
+                  title="Chave"
+                  image_url={inspection?.original?.images?.key_img_url}
+                />
+
+                <ImageCard
+                  title="Roda dianteira direita"
+                  image_url={
+                    inspection?.original?.images?.forward_right_wheel_img_url
+                  }
+                />
+
+                <ImageCard
+                  title="Roda dianteira esquerda"
+                  image_url={
+                    inspection?.original?.images?.forward_left_wheel_img_url
+                  }
+                />
+
+                <ImageCard
+                  title="Roda traseira esquerda"
+                  image_url={
+                    inspection?.original?.images?.rear_left_wheel_img_url
+                  }
+                />
+
+                <ImageCard
+                  title="Roda traseira direita"
+                  image_url={
+                    inspection?.original?.images?.rear_right_wheel_img_url
+                  }
+                />
+
+                <ImageCard
+                  title="Coluna esquerda"
+                  image_url={inspection?.original?.images?.left_column_img_url}
+                />
+
+                <ImageCard
+                  title="Coluna direita"
+                  image_url={inspection?.original?.images?.right_column_img_url}
+                />
+
+                <ImageCard
+                  title="Hodômetro"
+                  image_url={inspection?.original?.images?.pedometer_img_url}
+                />
+
+                <ImageCard
+                  title="Pneu dianteiro da direita"
+                  image_url={
+                    inspection?.original?.images?.forward_right_tire_img_url
+                  }
+                />
+
+                <ImageCard
+                  title="Pneu dianteiro da esquerda"
+                  image_url={
+                    inspection?.original?.images?.forward_left_tire_img_url
+                  }
+                />
+
+                <ImageCard
+                  title="Pneu traseiro da direita"
+                  image_url={
+                    inspection?.original?.images?.rear_right_tire_img_url
+                  }
+                />
+
+                <ImageCard
+                  title="Pneu traseiro da esquerda"
+                  image_url={
+                    inspection?.original?.images?.rear_left_tire_img_url
+                  }
+                />
+
+                <ImageCard
+                  title="Console"
+                  image_url={inspection?.original?.images?.console_img_url}
+                />
+
+                <ImageCard
+                  title="Número do motor"
+                  image_url={
+                    inspection?.original?.images?.engine_number_img_url
+                  }
+                />
+
+                <ImageCard
+                  title="Amortecedor dianteiro da direita"
+                  image_url={
+                    inspection?.original?.images?.forward_right_buffer_img_url
+                  }
+                />
+
+                <ImageCard
+                  title="Amortecedor dianteiro da esquerda"
+                  image_url={
+                    inspection?.original?.images?.forward_left_buffer_img_url
+                  }
+                />
+
+                <ImageCard
+                  title="Amortecedor traseiro da direita"
+                  image_url={
+                    inspection?.original?.images?.rear_right_buffer_img_url
+                  }
+                />
+
+                <ImageCard
+                  title="Amortecedor traseiro da esquerda"
+                  image_url={
+                    inspection?.original?.images?.rear_left_buffer_img_url
+                  }
+                />
+
+                {inspection?.original?.images?.glass?.map(glass => (
                   <ImageCard
                     id={glass.id}
                     title={glass.name}
@@ -169,7 +352,7 @@ const InspectionInfoModal: React.FC<IInspectionInfoModalProps> = ({
                   />
                 ))}
 
-                {inspection?.original?.images.breakdowns?.map(breakdown => (
+                {inspection?.original?.images?.breakdowns?.map(breakdown => (
                   <ImageCard
                     id={breakdown.id}
                     title="Avaria"
@@ -178,14 +361,18 @@ const InspectionInfoModal: React.FC<IInspectionInfoModalProps> = ({
                 ))}
               </SimpleGrid>
 
-              <Flex mt={4}>
+              <Flex mt={4} alignItems="center">
+                <Text fontWeight="bold" fontSize={18} marginRight={4}>
+                  Decisão:
+                </Text>
+
                 <Select
                   placeholder="Situação"
                   backgroundColor="#CBD5E0"
                   name="status"
                   containerProps={{
                     backgroundColor: '#CBD5E0',
-                    width: 250,
+                    width: 332,
                     border: '1px solid',
                     borderColor: '#A0AEC0',
                   }}

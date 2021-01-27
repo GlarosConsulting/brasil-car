@@ -13,8 +13,8 @@ import formatFileToUrl from '@shared/utils/formatFileToUrl';
 
 import Inspection from '@modules/inspections/infra/typeorm/entities/Inspection';
 
-@Entity('breakdowns')
-export default class Breakdown {
+@Entity('inspections_breakdowns')
+export default class InspectionBreakdown {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

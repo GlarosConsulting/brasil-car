@@ -10,7 +10,7 @@ interface IRequest {
   start_date?: Date;
   end_date?: Date;
   status?: Status;
-  is_detailed: boolean;
+  is_detailed?: boolean;
 }
 
 @injectable()
@@ -26,11 +26,22 @@ class ListInspectionsService {
     status,
     is_detailed,
   }: IRequest): Promise<Inspection[]> {
-    const inspections = await this.inspectionsRepository.findAllInspections({
+    let inspections;
+
+    if (is_detailed) {
+      inspections = await this.inspectionsRepository.findFilterInspections({
+        start_date: start_date ? startOfDay(start_date) : undefined,
+        end_date: end_date ? endOfDay(end_date) : undefined,
+        status,
+        is_detailed,
+      });
+      return inspections;
+    }
+
+    inspections = await this.inspectionsRepository.findAll({
       start_date: start_date ? startOfDay(start_date) : undefined,
       end_date: end_date ? endOfDay(end_date) : undefined,
       status,
-      is_detailed,
     });
 
     return inspections;

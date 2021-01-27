@@ -1,18 +1,14 @@
-import { addDays, endOfDay } from 'date-fns';
+import { merge } from 'lodash';
 import { injectable, inject } from 'tsyringe';
 
 import IStorageProvider from '@shared/container/providers/StorageProvider/models/IStorageProvider';
+import AppError from '@shared/errors/AppError';
 
 import Inspection from '@modules/inspections/infra/typeorm/entities/Inspection';
-import IInspectionsBreakdownsRepository from '@modules/inspections/repositories/IInspectionsBreakdownsRepository';
-import IInspectionsGlassRepository from '@modules/inspections/repositories/IInspectionsGlassRepository';
 import IInspectionsRepository from '@modules/inspections/repositories/IInspectionsRepository';
-import CreateBreakdownsService from '@modules/inspections/services/CreateBreakdownsService';
-import CreateInspectionGlassService from '@modules/inspections/services/CreateInspectionGlassService';
 
 interface IRequest {
-  user_id: string;
-  is_detailed: boolean;
+  id: string;
   filenames: {
     forward?: string;
     croup?: string;
@@ -52,11 +48,6 @@ interface IRequest {
     rear_right_buffer?: string;
     rear_left_buffer?: string;
   };
-  breakdowns?: string[];
-  right_glass?: string[];
-  left_glass?: string[];
-  forward_glass?: string[];
-  rear_glass?: string[];
 }
 
 interface IFilenames {
@@ -100,45 +91,22 @@ interface IFilenames {
 }
 
 @injectable()
-class CreateInspectionService {
-  private createBreakdownService: CreateBreakdownsService;
-
-  private createInspectionGlassService: CreateInspectionGlassService;
-
+class UpdateInspectionsImagesService {
   constructor(
     @inject('InspectionsRepository')
     private inspectionsRepository: IInspectionsRepository,
 
-    @inject('InspectionsBreakdownsRepository')
-    private inspectionsBreakdownsRepository: IInspectionsBreakdownsRepository,
-
-    @inject('InspectionsGlassRepository')
-    private inspectionsGlassRepository: IInspectionsGlassRepository,
-
     @inject('StorageProvider')
     private storageProvider: IStorageProvider,
-  ) {
-    this.createBreakdownService = new CreateBreakdownsService(
-      inspectionsBreakdownsRepository,
-      storageProvider,
-    );
+  ) {}
 
-    this.createInspectionGlassService = new CreateInspectionGlassService(
-      inspectionsGlassRepository,
-      storageProvider,
-    );
-  }
+  public async execute({ id, filenames }: IRequest): Promise<Inspection> {
+    const inspection = await this.inspectionsRepository.findById(id);
 
-  public async execute({
-    user_id,
-    filenames,
-    breakdowns,
-    right_glass,
-    left_glass,
-    forward_glass,
-    rear_glass,
-    is_detailed,
-  }: IRequest): Promise<Inspection> {
+    if (!inspection) {
+      throw new AppError('Inspection not found', 404);
+    }
+
     const allFilenames: Array<keyof typeof filenames> = [
       'forward',
       'croup',
@@ -183,24 +151,37 @@ class CreateInspectionService {
       file => filenames[file] !== undefined,
     );
 
+    const sentFieldsOnDatabase: string[] = [];
+
+    filledFiles.forEach(file => {
+      if (filenames[file] === undefined) {
+        return;
+      }
+
+      sentFieldsOnDatabase.push(`${file}_img`);
+    });
+
+    for (const field of sentFieldsOnDatabase) {
+      const filename = (inspection as any)[field];
+
+      if (filename) {
+        await this.storageProvider.deleteFile(filename);
+      }
+    }
+
     const filledFilenames = filledFiles.map(file =>
       this.storageProvider.saveFile(filenames[file] as string),
     );
 
-    const savedFilledFilenames = await Promise.all(filledFilenames);
+    const savedFiles = await Promise.all(filledFilenames);
 
     const sentFilenames: IFilenames = {};
 
     for (let i = 0; i < filledFiles.length; i++) {
-      sentFilenames[filledFiles[i]] = savedFilledFilenames[i];
+      sentFilenames[filledFiles[i]] = savedFiles[i];
     }
 
-    const limitDate = addDays(endOfDay(Date.now()), 3);
-
-    const inspection = await this.inspectionsRepository.create({
-      user_id,
-      is_detailed,
-      limit_date: limitDate,
+    merge(inspection, {
       forward_img: sentFilenames?.forward,
       croup_img: sentFilenames?.croup,
       left_side_img: sentFilenames?.left_side,
@@ -242,67 +223,8 @@ class CreateInspectionService {
       rear_left_buffer_img: sentFilenames?.rear_left_buffer,
     });
 
-    if (breakdowns) {
-      const breakdownsPromises = breakdowns.map(breakdown =>
-        this.createBreakdownService.execute({
-          img_filename: breakdown,
-          inspection_id: inspection.id,
-        }),
-      );
-
-      await Promise.all(breakdownsPromises);
-    }
-
-    if (right_glass) {
-      const glassPromises = right_glass.map(rightInspectionGlass =>
-        this.createInspectionGlassService.execute({
-          img_filename: rightInspectionGlass,
-          inspection_id: inspection.id,
-          name: 'vidro da lateral direita',
-        }),
-      );
-
-      await Promise.all(glassPromises);
-    }
-
-    if (left_glass) {
-      const glassPromises = left_glass.map(leftInspectionGlass =>
-        this.createInspectionGlassService.execute({
-          img_filename: leftInspectionGlass,
-          inspection_id: inspection.id,
-          name: 'vidoro da lateral esquerda',
-        }),
-      );
-
-      await Promise.all(glassPromises);
-    }
-
-    if (forward_glass) {
-      const glassPromises = forward_glass.map(forwardInspectionGlass =>
-        this.createInspectionGlassService.execute({
-          img_filename: forwardInspectionGlass,
-          inspection_id: inspection.id,
-          name: 'vidoro da dianteira',
-        }),
-      );
-
-      await Promise.all(glassPromises);
-    }
-
-    if (rear_glass) {
-      const glassPromises = rear_glass.map(rearInspectionGlass =>
-        this.createInspectionGlassService.execute({
-          img_filename: rearInspectionGlass,
-          inspection_id: inspection.id,
-          name: 'vidoro da traseira',
-        }),
-      );
-
-      await Promise.all(glassPromises);
-    }
-
-    return inspection;
+    return this.inspectionsRepository.save(inspection);
   }
 }
 
-export default CreateInspectionService;
+export default UpdateInspectionsImagesService;

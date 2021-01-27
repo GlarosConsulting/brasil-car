@@ -19,6 +19,7 @@ import Button from '../../components/Button';
 import Header from '../../components/Header';
 import PhotoCard from '../../components/PhotoCard';
 import { useAuth } from '../../hooks/auth';
+import IInspection from '../../interfaces/inspections/IInspection';
 import api from '../../services/api';
 import getCarSideTranslation from '../../utils/getCarSideTranslation';
 import getValidationErrors from '../../utils/getValidationError';
@@ -27,7 +28,7 @@ import { Cards, EmptyListContainer, EmptyListText } from './styles';
 
 interface IListPhotoUri {
   id: number;
-  uri?: string;
+  photo_uri?: string;
   data?: any;
 }
 
@@ -71,6 +72,11 @@ interface IFormData {
   rear_right_buffer: string;
 }
 
+interface ISendPhotos {
+  key: string;
+  photo_uri?: string;
+}
+
 const DetailedInspection: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
@@ -104,28 +110,48 @@ const DetailedInspection: React.FC = () => {
       const schema = Yup.object().shape({
         forward_left: Yup.string().required(),
         forward_right: Yup.string().required(),
+        rear_left: Yup.string().required(),
+        rear_right: Yup.string().required(),
+        forward_right_with_opened_hood: Yup.string().required(),
+        forward_left_with_opened_hood: Yup.string().required(),
+        forward_with_opened_hood: Yup.string().required(),
+        rear_plate: Yup.string().required(),
+        opened_trunk: Yup.string().required(),
+        seal_plate: Yup.string().required(),
+        spare_tire: Yup.string().required(),
+        key: Yup.string().required(),
+        forward_left_wheel: Yup.string().required(),
+        forward_right_wheel: Yup.string().required(),
+        rear_left_wheel: Yup.string().required(),
+        rear_right_wheel: Yup.string().required(),
+        panel: Yup.string().required(),
+        left_column: Yup.string().required(),
+        right_column: Yup.string().required(),
+        pedometer: Yup.string().required(),
+        forward_left_tire: Yup.string().required(),
+        forward_right_tire: Yup.string().required(),
+        rear_left_tire: Yup.string().required(),
+        rear_right_tire: Yup.string().required(),
+        console: Yup.string(),
+        chassi: Yup.string().required(),
+        engine_number: Yup.string(),
+        document: Yup.string().required(),
+        forward_left_buffer: Yup.string().required(),
+        forward_right_buffer: Yup.string().required(),
+        rear_left_buffer: Yup.string().required(),
+        rear_right_buffer: Yup.string().required(),
       });
 
       await schema.validate(data, {
         abortEarly: false,
       });
 
-      const formData = new FormData();
+      setIsSending(true);
+
+      let formData = new FormData();
 
       formData.append('user_id', user?.uid || 'not_found');
       formData.append('is_detailed', 'true');
-
-      Object.keys(data).forEach(key => {
-        const value = (data as any)[key];
-
-        if (value) {
-          appendImageToFormData(formData, key, value);
-        }
-      });
-
-      breakdownsPhotoUri.forEach(breakdown =>
-        appendImageToFormData(formData, 'breakdown', breakdown.uri),
-      );
 
       glassPhotoUri.forEach(
         glass =>
@@ -133,15 +159,54 @@ const DetailedInspection: React.FC = () => {
           appendImageToFormData(
             formData,
             `${glass.data.side}_glass`,
-            glass.uri,
+            glass.photo_uri,
           ),
       );
 
-      setIsSending(true);
+      breakdownsPhotoUri.forEach(breakdown =>
+        appendImageToFormData(formData, 'breakdown', breakdown.photo_uri),
+      );
 
-      await api.post('/inspections', formData);
+      const { data: inspection } = await api.post<IInspection>(
+        '/inspections',
+        formData,
+      );
+
+      const photos: ISendPhotos[] = [];
+
+      Object.keys(data).forEach(key => {
+        const value = (data as any)[key];
+
+        if (value) {
+          photos.push({
+            key,
+            photo_uri: value,
+          });
+        }
+      });
+
+      let sending: ISendPhotos[] = [];
+
+      for (let i = 0; i < photos.length; i++) {
+        sending.push(photos[i]);
+
+        if (i % 4 === 0 || i === photos.length - 1) {
+          formData = new FormData();
+
+          sending.forEach(photo =>
+            appendImageToFormData(formData, photo.key, photo.photo_uri),
+          );
+
+          await api.put(`/inspections/${inspection.id}`, formData);
+
+          sending = [];
+        }
+      }
 
       formRef.current?.reset();
+
+      setBreakdownsPhotoUri([]);
+      setGlassPhotoUri([]);
 
       Alert.alert(
         'Enviado com sucesso',
@@ -160,10 +225,7 @@ const DetailedInspection: React.FC = () => {
 
       console.log(JSON.stringify(err));
 
-      Alert.alert(
-        'Ocorreu um erro',
-        'Ocorreu um erro inesperado ao enviar as fotos, tente novamente.',
-      );
+      Alert.alert('Ocorreu um erro inesperado', JSON.stringify(err));
     } finally {
       setIsSending(false);
     }
@@ -173,7 +235,7 @@ const DetailedInspection: React.FC = () => {
     ({ list, setList }: IListActions, data?: any) => {
       const id = list.length + 1;
 
-      setList([...list, { id, uri: undefined, data }]);
+      setList([...list, { id, photo_uri: undefined, data }]);
     },
     [breakdownsPhotoUri],
   );
@@ -181,7 +243,7 @@ const DetailedInspection: React.FC = () => {
   const handleChangeListPhotoUri = useCallback(
     (id: number, uri: string | undefined, { list, setList }: IListActions) => {
       const newListPhotosUri = list.map(item =>
-        item.id === id ? { ...item, uri } : item,
+        item.id === id ? { ...item, photo_uri: uri } : item,
       );
 
       setList(newListPhotosUri);
@@ -205,73 +267,44 @@ const DetailedInspection: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    formRef.current?.setData({
-      forward_left:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      forward_right:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      rear_left:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      rear_right:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      forward_right_with_opened_hood:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      forward_left_with_opened_hood:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      forward_with_opened_hood:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      rear_plate:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      opened_trunk:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      seal_plate:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      spare_tire:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      key:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      forward_left_wheel:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      forward_right_wheel:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      rear_left_wheel:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      rear_right_wheel:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      panel:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      left_column:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      right_column:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      pedometer:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      forward_left_tire:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      forward_right_tire:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      rear_left_tire:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      rear_right_tire:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      console:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      chassi:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      engine_number:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      document:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      forward_left_buffer:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      forward_right_buffer:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      rear_left_buffer:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
-      rear_right_buffer:
-        'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_7ff6e726-e779-4e54-97ac-9572fee4727b.jpg',
+    const photoUri =
+      'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_a7fba4ae-75c3-465a-aa07-d47b92553c9c.jpg';
+
+    formRef?.current?.setData({
+      forward_left: photoUri,
+      forward_right: photoUri,
+      rear_left: photoUri,
+      rear_right: photoUri,
+      forward_right_with_opened_hood: photoUri,
+      forward_left_with_opened_hood: photoUri,
+      forward_with_opened_hood: photoUri,
+      rear_plate: photoUri,
+      opened_trunk: photoUri,
+      seal_plate: photoUri,
+      spare_tire: photoUri,
+      key: photoUri,
+      forward_left_wheel: photoUri,
+      forward_right_wheel: photoUri,
+      rear_left_wheel: photoUri,
+      rear_right_wheel: photoUri,
+      panel: photoUri,
+      left_column: photoUri,
+      right_column: photoUri,
+      pedometer: photoUri,
+      forward_left_tire: photoUri,
+      forward_right_tire: photoUri,
+      rear_left_tire: photoUri,
+      rear_right_tire: photoUri,
+      console: photoUri,
+      chassi: photoUri,
+      engine_number: photoUri,
+      document: photoUri,
+      forward_left_buffer: photoUri,
+      forward_right_buffer: photoUri,
+      rear_left_buffer: photoUri,
+      rear_right_buffer: photoUri,
     });
-  }, [formRef]);
+  }, []);
 
   return (
     <>
@@ -469,6 +502,7 @@ const DetailedInspection: React.FC = () => {
           <OptionsMenu
             customButton={
               <TouchableOpacity
+                activeOpacity={0.6}
                 style={{
                   backgroundColor: '#312e38',
                   width: Dimensions.get('screen').width - 32,
@@ -537,7 +571,7 @@ const DetailedInspection: React.FC = () => {
                 title={`Vidro ${index + 1} (${
                   capitalize(getCarSideTranslation(glass.data.side)) || '-'
                 })`}
-                uri={glass.uri}
+                uri={glass.photo_uri}
                 onPhotoUriChange={uri =>
                   handleChangeListPhotoUri(glass.id, uri, {
                     list: glassPhotoUri,
@@ -570,7 +604,7 @@ const DetailedInspection: React.FC = () => {
                 key={breakdown.id}
                 {...photoCardProps}
                 title={`Avaria ${index + 1}`}
-                uri={breakdown.uri}
+                uri={breakdown.photo_uri}
                 onPhotoUriChange={uri =>
                   handleChangeListPhotoUri(breakdown.id, uri, {
                     list: breakdownsPhotoUri,

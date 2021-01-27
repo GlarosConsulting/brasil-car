@@ -2,15 +2,15 @@ import { addDays, endOfDay } from 'date-fns';
 
 import FakeStorageProvider from '@shared/container/providers/StorageProvider/fakes/FakeStorageProvider';
 
-import FakeBreakdownsRepository from '@modules/inspections/repositories/fakes/FakeBreakdownsRepository';
-import FakeInspectionGlassRepository from '@modules/inspections/repositories/fakes/FakeInspectionGlassRepository';
+import FakeInspectionsBreakdownsRepository from '@modules/inspections/repositories/fakes/FakeInspectionsBreakdownsRepository';
+import FakeInspectionsGlassRepository from '@modules/inspections/repositories/fakes/FakeInspectionsGlassRepository';
 import FakeInspectionsRepository from '@modules/inspections/repositories/fakes/FakeInspectionsRepository';
 
 import CreateInspectionService from './CreateInspectionService';
 
 let fakeInspectionsRepository: FakeInspectionsRepository;
-let fakeInspectionGlassRepository: FakeInspectionGlassRepository;
-let fakeBreakdownsRepository: FakeBreakdownsRepository;
+let fakeInspectionsGlassRepository: FakeInspectionsGlassRepository;
+let fakeInspectionsBreakdownsRepository: FakeInspectionsBreakdownsRepository;
 let fakeStorageProvider: FakeStorageProvider;
 let createInspection: CreateInspectionService;
 
@@ -18,12 +18,12 @@ describe('CreateInspection', () => {
   beforeEach(() => {
     fakeInspectionsRepository = new FakeInspectionsRepository();
     fakeStorageProvider = new FakeStorageProvider();
-    fakeBreakdownsRepository = new FakeBreakdownsRepository();
+    fakeInspectionsBreakdownsRepository = new FakeInspectionsBreakdownsRepository();
 
     createInspection = new CreateInspectionService(
       fakeInspectionsRepository,
-      fakeBreakdownsRepository,
-      fakeInspectionGlassRepository,
+      fakeInspectionsBreakdownsRepository,
+      fakeInspectionsGlassRepository,
       fakeStorageProvider,
     );
   });

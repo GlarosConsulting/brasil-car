@@ -17,6 +17,7 @@ import * as Yup from 'yup';
 import Footer from '@/components/Footer';
 import CreateUsersModal from '@/components/Modals/CreateNewUser';
 import ForgotPasswordModal from '@/components/Modals/ForgotPassword';
+import SocialButton from '@/components/SocialButton';
 import getValidationErrors from '@/utils/getValidationErrors';
 
 import Header from '../components/Header';
@@ -30,7 +31,7 @@ interface IUserCredentialsFormData {
 }
 
 const Login: React.FC = () => {
-  const { signIn } = useAuthentication();
+  const { signIn, signInWithPopup } = useAuthentication();
 
   const toast = useToast();
   const formRef = useRef<FormHandles>(null);
@@ -134,8 +135,17 @@ const Login: React.FC = () => {
                 Entrar
               </Button>
 
-              <Button
+              <SocialButton
+                btnType="google"
+                color="#de4d41"
+                backgroundColor="#f5e7ea"
+                onClick={() => signInWithPopup('google')}
                 marginTop={3}
+              >
+                Entrar com o Google
+              </SocialButton>
+
+              <Button
                 marginBottom={3}
                 type="submit"
                 bg="gray.500"
