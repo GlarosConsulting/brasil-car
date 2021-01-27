@@ -87,7 +87,7 @@ const InspectionInfoModal: React.FC<IInspectionInfoModalProps> = ({
     <Modal size="full" isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
 
-      <ModalContent borderRadius="md">
+      <ModalContent paddingX={64} borderRadius="md">
         <ModalHeader>Vistoria</ModalHeader>
         <ModalCloseButton />
 
@@ -362,14 +362,18 @@ const InspectionInfoModal: React.FC<IInspectionInfoModalProps> = ({
                 ))}
               </SimpleGrid>
 
-              <Flex mt={4}>
+              <Flex mt={4} alignItems="center">
+                <Text fontWeight="bold" fontSize={18} marginRight={4}>
+                  Decisão:
+                </Text>
+
                 <Select
                   placeholder="Situação"
                   backgroundColor="#CBD5E0"
                   name="status"
                   containerProps={{
                     backgroundColor: '#CBD5E0',
-                    width: 250,
+                    width: 332,
                     border: '1px solid',
                     borderColor: '#A0AEC0',
                   }}

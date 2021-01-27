@@ -20,6 +20,8 @@ const ImageCard: React.FC<IImageCardProps> = ({ id, title, image_url }) => {
     <>
       {image_url && (
         <Box
+          width="100%"
+          maxWidth={600}
           id={id || ''}
           position="relative"
           borderRadius="md"
