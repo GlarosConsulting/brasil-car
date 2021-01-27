@@ -154,14 +154,20 @@ class UpdateInspectionsImagesService {
     const sentFieldsOnDatabase: string[] = [];
 
     filledFiles.forEach(file => {
-      if (filenames[file] !== undefined) {
-        sentFieldsOnDatabase.push(`${file}_img`);
+      if (filenames[file] === undefined) {
+        return;
       }
+
+      sentFieldsOnDatabase.push(`${file}_img`);
     });
 
-    sentFieldsOnDatabase.forEach(async field => {
-      await this.storageProvider.deleteFile((inspection as any)[field]);
-    });
+    for (const field of sentFieldsOnDatabase) {
+      const filename = (inspection as any)[field];
+
+      if (filename) {
+        await this.storageProvider.deleteFile(filename);
+      }
+    }
 
     const filledFilenames = filledFiles.map(file =>
       this.storageProvider.saveFile(filenames[file] as string),
