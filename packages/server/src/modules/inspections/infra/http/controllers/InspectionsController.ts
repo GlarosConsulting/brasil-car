@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { container } from 'tsyringe';
 
 import CreateInspectionService from '@modules/inspections/services/CreateInspectionService';
+import ListInspectionsService from '@modules/inspections/services/ListInspectionsService';
 import UpdateInspectionsImagesService from '@modules/inspections/services/UpdateInspectionsImagesService';
 
 export default class InspectionsController {
@@ -74,6 +75,20 @@ export default class InspectionsController {
     });
 
     return response.json(classToClass(inspection));
+  }
+
+  public async index(request: Request, response: Response): Promise<Response> {
+    const { start_date, end_date, status } = request.query;
+
+    const listInspections = container.resolve(ListInspectionsService);
+
+    const inspections = await listInspections.execute({
+      start_date,
+      end_date,
+      status,
+    } as any);
+
+    return response.json(classToClass(inspections));
   }
 
   public async update(request: Request, response: Response): Promise<Response> {

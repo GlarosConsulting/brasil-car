@@ -41,6 +41,8 @@ inspectionsRouter.get(
   detailedInspectionsController.index,
 );
 
+inspectionsRouter.get('/', inspectionsController.index);
+
 inspectionsRouter.post(
   '/',
   upload.fields([

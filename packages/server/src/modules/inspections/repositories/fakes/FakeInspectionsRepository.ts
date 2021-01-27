@@ -11,7 +11,7 @@ import IInspectionsRepository from '../IInspectionsRepository';
 class FakeInspectionsRepository implements IInspectionsRepository {
   private inspections: Inspection[] = [];
 
-  public async findAllInspections({
+  public async findAll({
     start_date,
     end_date,
     status,
@@ -26,6 +26,35 @@ class FakeInspectionsRepository implements IInspectionsRepository {
       }
 
       if (status && inspection.status !== status) {
+        return false;
+      }
+
+      return true;
+    });
+
+    return filterInspections;
+  }
+
+  public async findFilterInspections({
+    start_date,
+    end_date,
+    status,
+    is_detailed,
+  }: IFindAllInspectionsDTO): Promise<Inspection[]> {
+    const filterInspections = this.inspections.filter(inspection => {
+      if (start_date && !isAfter(inspection.created_at, start_date)) {
+        return false;
+      }
+
+      if (end_date && !isBefore(inspection.created_at, end_date)) {
+        return false;
+      }
+
+      if (status && inspection.status !== status) {
+        return false;
+      }
+
+      if (is_detailed && inspection.is_detailed !== is_detailed) {
         return false;
       }
 

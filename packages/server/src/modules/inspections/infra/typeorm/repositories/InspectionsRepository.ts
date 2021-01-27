@@ -18,7 +18,7 @@ class InspectionsRepository implements IInspectionsRepository {
     this.ormRepository = getRepository(Inspection);
   }
 
-  public async findAllInspections({
+  public async findFilterInspections({
     start_date,
     end_date,
     status,
@@ -45,6 +45,35 @@ class InspectionsRepository implements IInspectionsRepository {
         ...{ is_detailed },
       },
       relations: ['breakdowns', 'glass'],
+    });
+
+    return inspections;
+  }
+
+  public async findAll({
+    start_date,
+    end_date,
+    status,
+  }: IFindAllInspectionsDTO): Promise<Inspection[]> {
+    let dateCriteria;
+
+    if (start_date) {
+      dateCriteria = MoreThan(end_date);
+    }
+
+    if (end_date) {
+      dateCriteria = LessThan(start_date);
+    }
+
+    if (start_date && end_date) {
+      dateCriteria = Between(start_date, end_date);
+    }
+
+    const inspections = await this.ormRepository.find({
+      where: {
+        ...(dateCriteria && { created_at: dateCriteria }),
+        ...(status && { status }),
+      },
     });
 
     return inspections;
