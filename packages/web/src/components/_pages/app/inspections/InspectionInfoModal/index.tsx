@@ -48,7 +48,6 @@ const InspectionInfoModal: React.FC<IInspectionInfoModalProps> = ({
   const formRef = useRef<FormHandles>(null);
 
   const toast = useToast();
-
   const handleChangeStatus = useCallback(
     async ({ status }: IFormData) => {
       try {

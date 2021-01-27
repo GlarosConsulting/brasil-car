@@ -1,7 +1,9 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import { Box, Flex, Image, useTheme } from '@chakra-ui/core';
 import { transparentize } from 'polished';
+
+import ImageModal from '../../ImageModal';
 
 interface IImageCardProps {
   id?: string;
@@ -11,9 +13,14 @@ interface IImageCardProps {
 
 const ImageCard: React.FC<IImageCardProps> = ({ id, title, image_url }) => {
   const theme = useTheme();
+  const [openImageModal, setOpenImageModal] = useState<string>();
 
-  const handleOpenImage = useCallback(() => {
-    window.open(image_url, '__blank');
+  const handleOpenImage = useCallback((url: string) => {
+    setOpenImageModal(url);
+  }, []);
+
+  const handleCloseImageModal = useCallback(async () => {
+    setOpenImageModal(undefined);
   }, []);
 
   return (
@@ -27,7 +34,7 @@ const ImageCard: React.FC<IImageCardProps> = ({ id, title, image_url }) => {
           borderRadius="md"
           overflow="hidden"
           cursor="pointer"
-          onClick={handleOpenImage}
+          onClick={() => handleOpenImage(image_url)}
         >
           <Image src={image_url} />
 
@@ -41,6 +48,12 @@ const ImageCard: React.FC<IImageCardProps> = ({ id, title, image_url }) => {
           >
             {title}
           </Flex>
+
+          <ImageModal
+            isOpen={!!openImageModal}
+            onClose={handleCloseImageModal}
+            image_url={image_url}
+          />
         </Box>
       )}
     </>
