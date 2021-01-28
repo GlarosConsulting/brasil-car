@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { container } from 'tsyringe';
 
 import CreateCashHandlingService from '@modules/cash_handling/services/CreateCashHandlingService';
+import DeleteCashHandlingService from '@modules/cash_handling/services/DeleteCashHandlingService';
 import ListByDateInterval from '@modules/cash_handling/services/ListByDateInterval';
 import ListCashHandlingService from '@modules/cash_handling/services/ListCashHandlingService';
 
@@ -40,6 +41,16 @@ export default class CashHandling {
     const cashHandling = await createCashHandling.execute(formData);
 
     return response.json(classToClass(cashHandling));
+  }
+
+  public async delete(request: Request, response: Response): Promise<Response> {
+    const { id } = request.params;
+
+    const deleteCashHandling = container.resolve(DeleteCashHandlingService);
+
+    await deleteCashHandling.execute({ id: String(id) });
+
+    return response.json().sendStatus(202);
   }
 
   public async index(request: Request, response: Response): Promise<Response> {
