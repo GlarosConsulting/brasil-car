@@ -20,6 +20,12 @@ class CashHandlingRepository implements ICashHandlingRepository {
     return cashHandling;
   }
 
+  public async findById(id: string): Promise<CashHandling | undefined> {
+    const cashHandling = await this.ormRepository.findOne(id);
+
+    return cashHandling;
+  }
+
   public async findByDateInterval(
     initialDate: Date,
     finalDate: Date,
@@ -45,6 +51,10 @@ class CashHandlingRepository implements ICashHandlingRepository {
 
   public async save(cashHandling: CashHandling): Promise<CashHandling> {
     return this.ormRepository.save(cashHandling);
+  }
+
+  public async delete(id: string): Promise<void> {
+    this.ormRepository.delete(id);
   }
 }
 

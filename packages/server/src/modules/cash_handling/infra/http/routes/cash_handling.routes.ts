@@ -30,4 +30,14 @@ cashHandlingRouter.get(
   }),
   cashHandlingController.index,
 );
+
+cashHandlingRouter.delete(
+  '/:id',
+  celebrate({
+    [Segments.PARAMS]: {
+      id: Joi.string().uuid().required(),
+    },
+  }),
+  cashHandlingController.delete,
+);
 export default cashHandlingRouter;
