@@ -32,7 +32,7 @@ const Sidebar: React.FC<ISidebarProps> = () => {
               <MenuItem>Movimentação Caixa</MenuItem>
             </Link>
             <MenuItem>Mensalidades</MenuItem>
-            <Link href="/not-detailed-inspections">
+            <Link href="/inspections">
               <MenuItem>Vistorias</MenuItem>
             </Link>
           </Menu>

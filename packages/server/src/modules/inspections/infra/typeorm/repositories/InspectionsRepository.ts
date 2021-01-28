@@ -74,6 +74,7 @@ class InspectionsRepository implements IInspectionsRepository {
         ...(dateCriteria && { created_at: dateCriteria }),
         ...(status && { status }),
       },
+      relations: ['breakdowns', 'glass'],
     });
 
     return inspections;
