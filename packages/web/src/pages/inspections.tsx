@@ -64,7 +64,7 @@ const Inspections: React.FC = () => {
   useEffect(() => {
     async function loadInspections() {
       const { data: newInspections } = await api.get<IInspection[]>(
-        '/inspections/detailed',
+        '/inspections',
       );
 
       setInspections(newInspections);
@@ -103,7 +103,7 @@ const Inspections: React.FC = () => {
   const handleSearch = useCallback(
     async ({ start_date, end_date, status }: IFormData) => {
       const { data: newInspections } = await api.get<IInspection[]>(
-        '/inspections/detailed',
+        '/inspections/not-detailed',
         {
           params: {
             start_date,
@@ -120,7 +120,7 @@ const Inspections: React.FC = () => {
 
   const handleCleanFilters = useCallback(async () => {
     const { data: newInspections } = await api.get<IInspection[]>(
-      '/inspections/detailed',
+      '/inspections',
     );
 
     setInspections(newInspections);
