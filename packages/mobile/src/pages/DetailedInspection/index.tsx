@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Dimensions, Alert, Text } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import OptionsMenu from 'react-native-option-menu';
@@ -266,7 +260,7 @@ const DetailedInspection: React.FC = () => {
     };
   }, []);
 
-  useEffect(() => {
+  /* useEffect(() => {
     const photoUri =
       'content://com.carauditapp.imagepickerprovider/cacheDir/rn_image_picker_lib_temp_a7fba4ae-75c3-465a-aa07-d47b92553c9c.jpg';
 
@@ -304,7 +298,7 @@ const DetailedInspection: React.FC = () => {
       rear_left_buffer: photoUri,
       rear_right_buffer: photoUri,
     });
-  }, []);
+  }, []); */
 
   return (
     <>
