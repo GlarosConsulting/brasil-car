@@ -57,7 +57,7 @@ export const Container = styled(Box)<IContainerProps>`
     color: var(--text-color-focused);
 
     &::placeholder {
-      color: var(--base-color);
+      color: #718096;
     }
   }
 `;
