@@ -1,9 +1,12 @@
+import { getStatusBarHeight } from 'react-native-iphone-x-helper';
+
 import styled from 'styled-components/native';
 
 export const Container = styled.View`
   flex: 1;
+
   padding: 12px 14px;
-  padding-top: 16px;
+  padding-top: ${16 + getStatusBarHeight()}px;
 `;
 
 export const DrawerHeader = styled.View`

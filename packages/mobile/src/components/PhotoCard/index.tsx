@@ -117,7 +117,7 @@ const PhotoCard: React.FC<IPhotoCardProps> = ({
           </TitleContainer>
         </Container>
       }
-      destructiveIndex={1}
+      destructiveIndex={2}
       options={['Camera', 'Galeria', 'Cancelar']}
       actions={[handleLaunchCamera, handleLaunchLibrary]}
     />
