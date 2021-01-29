@@ -24,8 +24,10 @@ monthlyPaymentsRouter.get(
   '/',
   celebrate({
     [Segments.QUERY]: {
-      start_date: Joi.date().allow(null),
-      end_date: Joi.date().allow(null),
+      due_start_date: Joi.date().allow(null),
+      due_end_date: Joi.date().allow(null),
+      created_at_start_date: Joi.date().allow(null),
+      created_at_end_date: Joi.date().allow(null),
       name: Joi.string().allow(null),
       status: Joi.number().allow(null).valid('paid', 'pending', 'opened'),
     },

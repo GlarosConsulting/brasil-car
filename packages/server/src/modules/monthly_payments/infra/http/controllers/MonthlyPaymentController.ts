@@ -25,13 +25,22 @@ export default class MonthlyPayment {
   }
 
   public async index(request: Request, response: Response): Promise<Response> {
-    const { start_date, end_date, name, status } = request.query;
+    const {
+      due_start_date,
+      due_end_date,
+      created_at_start_date,
+      created_at_end_date,
+      name,
+      status,
+    } = request.query;
 
     const listMonthlyPayment = container.resolve(ListMonthlyPaymentService);
 
     const monthlyPayment = await listMonthlyPayment.execute({
-      start_date,
-      end_date,
+      due_start_date,
+      due_end_date,
+      created_at_start_date,
+      created_at_end_date,
       name,
       status,
     } as any);
