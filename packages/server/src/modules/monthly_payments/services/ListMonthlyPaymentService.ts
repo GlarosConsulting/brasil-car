@@ -17,14 +17,19 @@ class ListMonthlyPaymentService {
 
   public async execute({
     name,
-    start_date,
-    end_date,
+    due_start_date,
+    due_end_date,
+    created_at_start_date,
+    created_at_end_date,
     status,
   }: IListMonthlyPaymentDTO): Promise<MonthlyPayment[]> {
     const monthlyPayment = await this.monthlyPaymentRepository.find({
       name,
-      start_date: start_date && startOfDay(start_date),
-      end_date: end_date && endOfDay(end_date),
+      due_start_date: due_start_date && startOfDay(due_start_date),
+      due_end_date: due_end_date && endOfDay(due_end_date),
+      created_at_start_date:
+        created_at_start_date && startOfDay(created_at_start_date),
+      created_at_end_date: created_at_end_date && endOfDay(created_at_end_date),
       status,
     });
 

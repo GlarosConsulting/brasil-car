@@ -21,29 +21,49 @@ class MonthlyPaymentRepository implements IMonthlyPaymentRepository {
   }
 
   public async find({
-    start_date,
-    end_date,
+    due_start_date,
+    due_end_date,
+    created_at_start_date,
+    created_at_end_date,
     name,
     status,
   }: IListMonthlyPaymentDTO): Promise<MonthlyPayment[] | undefined> {
-    let dateCriteria;
+    let dueDateCriteria;
 
-    if (start_date) {
-      dateCriteria = MoreThan(end_date);
+    if (due_end_date) {
+      dueDateCriteria = MoreThan(due_end_date);
     }
 
-    if (end_date) {
-      dateCriteria = LessThan(start_date);
+    if (due_start_date) {
+      dueDateCriteria = LessThan(due_start_date);
     }
 
-    if (start_date && end_date) {
-      dateCriteria = Between(start_date, end_date);
+    if (due_start_date && due_start_date) {
+      dueDateCriteria = Between(due_start_date, due_end_date);
+    }
+
+    let created_atDateCriteria;
+
+    if (created_at_end_date) {
+      created_atDateCriteria = MoreThan(created_at_end_date);
+    }
+
+    if (created_at_start_date) {
+      created_atDateCriteria = LessThan(created_at_start_date);
+    }
+
+    if (created_at_start_date && created_at_start_date) {
+      created_atDateCriteria = Between(
+        created_at_start_date,
+        created_at_end_date,
+      );
     }
 
     const monthlyPayment = await this.ormRepository.find({
       order: { created_at: 'DESC' },
       where: {
-        ...(dateCriteria && { created_at: dateCriteria }),
+        ...(dueDateCriteria && { due_date: dueDateCriteria }),
+        ...(created_atDateCriteria && { created_at: created_atDateCriteria }),
         ...(status && { status }),
         ...(name && { name: Like(`%${name}%`) }),
       },
