@@ -8,9 +8,8 @@ target 'carauditapp' do
 
   use_react_native!(:path => '../../../node_modules/react-native')
 
-  pod 'react-native-image-picker', :path => '../../../node_modules/react-native-image-picker'
-
-  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+  permissions_path = '../../../node_modules/react-native-permissions/ios'
+  pod 'Permission-Camera', :path => "#{permissions_path}/Camera/Permission-Camera.podspec"
 
   target 'carauditappTests' do
     inherit! :complete

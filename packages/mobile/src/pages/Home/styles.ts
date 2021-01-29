@@ -1,3 +1,5 @@
+import { getBottomSpace } from 'react-native-iphone-x-helper';
+
 import styled from 'styled-components/native';
 
 export const Container = styled.View`
@@ -10,7 +12,9 @@ export const ContactButtonContainer = styled.TouchableOpacity`
 
   background: #344c66;
   width: 100%;
-  height: 56px;
+  min-height: 56px;
+
+  padding: 16px 0 ${16 + getBottomSpace()}px;
 
   justify-content: center;
   align-items: center;

@@ -1,14 +1,17 @@
+import { getStatusBarHeight } from 'react-native-iphone-x-helper';
+
 import styled from 'styled-components/native';
 
 export const Container = styled.View`
   background: #344c66;
-  height: 64px;
+  min-height: 64px;
 
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
 
-  padding: 0 16px;
+  padding: 16px;
+  padding-top: ${16 + getStatusBarHeight()}px;
 `;
 
 export const Left = styled.View`
@@ -25,5 +28,5 @@ export const LogoImage = styled.Image`
 
 export const UserLabel = styled.Text`
   color: #fff;
-  font-size: 16px;
+  font-size: 17px;
 `;
