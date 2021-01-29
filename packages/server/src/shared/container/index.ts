@@ -10,6 +10,8 @@ import InspectionsRepository from '@modules/inspections/infra/typeorm/repositori
 import IInspectionsBreakdownsRepository from '@modules/inspections/repositories/IInspectionsBreakdownsRepository';
 import IInspectionsGlassRepository from '@modules/inspections/repositories/IInspectionsGlassRepository';
 import IInspectionsRepository from '@modules/inspections/repositories/IInspectionsRepository';
+import MonthlyPaymentRepository from '@modules/monthly_payments/infra/typeorm/repositories/MonthlyPaymentRepository';
+import IMonthlyPaymentRepository from '@modules/monthly_payments/repositories/IMonthlyPaymentRepository';
 import ReturnFilesRepository from '@modules/return_files/infra/typeorm/repositories/ReturnFilesRepository';
 import IReturnFilesRepository from '@modules/return_files/repositories/IReturnFilesRepository';
 
@@ -36,4 +38,9 @@ container.registerSingleton<ICashHandlingRepository>(
 container.registerSingleton<IReturnFilesRepository>(
   'ReturnFilesRepository',
   ReturnFilesRepository,
+);
+
+container.registerSingleton<IMonthlyPaymentRepository>(
+  'MonthlyPaymentRepository',
+  MonthlyPaymentRepository,
 );
