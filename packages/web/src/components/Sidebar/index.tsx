@@ -31,7 +31,9 @@ const Sidebar: React.FC<ISidebarProps> = () => {
             <Link href="/cash-handling">
               <MenuItem>Movimentação Caixa</MenuItem>
             </Link>
-            <MenuItem>Mensalidades</MenuItem>
+            <Link href="/monthly-payments">
+              <MenuItem>Mensalidades</MenuItem>
+            </Link>
             <Link href="/inspections">
               <MenuItem>Vistorias</MenuItem>
             </Link>
